@@ -76,10 +76,15 @@
       opacity: 0.9;
     }
 
-    .share-btn {
+    .header-buttons {
       position: absolute;
       top: 16px;
       right: 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .header-btn {
       background: rgba(255, 255, 255, 0.2);
       border: none;
       color: white;
@@ -93,9 +98,34 @@
       transition: var(--transition);
     }
 
-    .share-btn:hover {
+    .header-btn:hover {
       background: rgba(255, 255, 255, 0.3);
       transform: scale(1.1);
+    }
+
+    /* New Trip Button - More visible */
+    .new-trip-btn {
+      background: rgba(255, 255, 255, 0.3);
+      border: 2px solid white;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      transform: translateY(-50%);
+    }
+
+    .new-trip-btn:hover {
+      background: white;
+      color: var(--primary);
+      transform: translateY(-50%) scale(1.05);
     }
 
     /* Setup Section */
@@ -141,6 +171,20 @@
     @media (max-width: 768px) {
       .share-options {
         grid-template-columns: 1fr;
+      }
+      
+      .header-buttons {
+        position: static;
+        justify-content: center;
+        margin-top: 16px;
+      }
+      
+      .new-trip-btn {
+        position: static;
+        transform: none;
+        margin-top: 12px;
+        justify-content: center;
+        width: 100%;
       }
     }
 
@@ -216,6 +260,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .trip-info {
+        flex-direction: column;
+        gap: 16px;
+      }
     }
 
     .trip-details h2 {
@@ -675,6 +726,12 @@
       .form-group {
         min-width: 100%;
       }
+      
+      .header-buttons {
+        position: static;
+        margin-top: 16px;
+        justify-content: center;
+      }
     }
 
     @media (max-width: 480px) {
@@ -700,6 +757,44 @@
       margin-bottom: 16px;
       opacity: 0.5;
     }
+    
+    /* New Trip Modal */
+    .new-trip-modal {
+      text-align: center;
+    }
+    
+    .new-trip-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .new-trip-options {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .new-trip-option {
+      padding: 20px;
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .new-trip-option:hover {
+      border-color: var(--primary);
+      background: #f0f9ff;
+      transform: translateY(-4px);
+    }
+    
+    .new-trip-option i {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      color: var(--primary);
+    }
   </style>
 </head>
 <body>
@@ -720,12 +815,12 @@
         <div class="setup-form">
           <div class="form-group">
             <label for="setupTripName"><i class="fas fa-suitcase"></i> Όνομα Ταξιδιού</label>
-             <input id="setupTripName" type="text" placeholder="Π.χ. Κρήτη Ιούλιος 2023">
+            <input id="setupTripName" type="text" placeholder="Π.χ. Κρήτη Ιούλιος 2023">
           </div>
           
           <div class="form-group">
             <label for="setupUserName"><i class="fas fa-user"></i> Το Όνομά Σας</label>
-<input id="setupUserName" type="text" placeholder="Το όνομά σας">
+            <input id="setupUserName" type="text" placeholder="Το όνομά σας">
           </div>
           
           <button class="btn btn-primary" onclick="createNewTrip()" style="width: 100%; margin-top: 16px;">
@@ -774,10 +869,52 @@
       <header>
         <h1><i class="fas fa-receipt"></i> Travel Expense Tracker</h1>
         <p class="tagline" id="tripTagline">Κοινή καταγραφή εξόδων</p>
-        <button class="share-btn" onclick="showShareModal()" title="Κοινή χρήση">
-          <i class="fas fa-share-alt"></i>
-        </button>
+        <div class="header-buttons">
+          <button class="header-btn" onclick="showShareModal()" title="Κοινή χρήση">
+            <i class="fas fa-share-alt"></i>
+          </button>
+          <button class="header-btn" onclick="showNewTripModal()" title="Νέο ταξίδι">
+            <i class="fas fa-plus-circle"></i>
+          </button>
+        </div>
       </header>
+
+      <!-- New Trip Modal -->
+      <div id="newTripModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2><i class="fas fa-plus-circle"></i> Δημιουργία Νέου Ταξιδιού</h2>
+            <button class="close-modal" onclick="closeNewTripModal()">&times;</button>
+          </div>
+          
+          <div class="new-trip-modal">
+            <p>Τι θα θέλατε να κάνετε;</p>
+            
+            <div class="new-trip-options">
+              <div class="new-trip-option" onclick="createBrandNewTrip()">
+                <i class="fas fa-plus"></i>
+                <h3>Νέο Ταξίδι</h3>
+                <p>Δημιουργία εντελώς νέου ταξιδιού</p>
+              </div>
+              
+              <div class="new-trip-option" onclick="switchToAnotherTrip()">
+                <i class="fas fa-exchange-alt"></i>
+                <h3>Αλλαγή Ταξιδιού</h3>
+                <p>Σύνδεση σε διαφορετικό ταξίδι</p>
+              </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+              <button class="btn btn-danger" onclick="resetCurrentTrip()" style="width: 100%;">
+                <i class="fas fa-redo"></i> Επαναφορά Τρέχοντος Ταξιδιού
+              </button>
+              <p style="font-size: 0.9rem; color: var(--gray); margin-top: 8px;">
+                Θα διαγραφούν όλες οι καταχωρήσεις από το τρέχον ταξίδι
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Trip Info -->
       <div class="trip-info">
@@ -997,8 +1134,8 @@
               <button class="btn btn-danger" style="flex: 1;" onclick="clearAllExpenses()">
                 <i class="fas fa-receipt"></i> Διαγραφή όλων των εξόδων
               </button>
-              <button class="btn btn-danger" style="flex: 1;" onclick="leaveTrip()">
-                <i class="fas fa-sign-out-alt"></i> Αποχώρηση από ταξίδι
+              <button class="btn btn-danger" style="flex: 1;" onclick="showNewTripModal()">
+                <i class="fas fa-plus-circle"></i> Νέο Ταξίδι
               </button>
             </div>
           </div>
@@ -1055,6 +1192,14 @@
       const urlParams = new URLSearchParams(window.location.search);
       const tripCode = urlParams.get('trip');
       const userName = urlParams.get('user');
+      const reset = urlParams.get('reset');
+      
+      // Αν ο χρήστης θέλει reset
+      if (reset === 'true') {
+        localStorage.removeItem('currentTripCode');
+        localStorage.removeItem('currentUserName');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
       
       if (tripCode) {
         // Προσπάθεια σύνδεσης με κωδικό από URL
@@ -1341,6 +1486,46 @@
       updateTotals();
       
       showToast(`Αφαιρέθηκε το μέλος "${memberToRemove}"`, 'success');
+    }
+
+    // ============================================
+    // ΝΕΕΣ ΣΥΝΑΡΤΗΣΕΙΣ ΓΙΑ ΝΕΟ ΤΑΞΙΔΙ
+    // ============================================
+    
+    function showNewTripModal() {
+      document.getElementById('newTripModal').style.display = 'flex';
+    }
+    
+    function closeNewTripModal() {
+      document.getElementById('newTripModal').style.display = 'none';
+    }
+    
+    function createBrandNewTrip() {
+      if (confirm('Θέλετε να δημιουργήσετε νέο ταξίδι; Θα αποσυνδεθείτε από το τρέχον.')) {
+        localStorage.removeItem('currentTripCode');
+        localStorage.removeItem('currentUserName');
+        location.reload();
+      }
+    }
+    
+    function switchToAnotherTrip() {
+      if (confirm('Θέλετε να συνδεθείτε σε άλλο ταξίδι; Θα αποσυνδεθείτε από το τρέχον.')) {
+        localStorage.removeItem('currentTripCode');
+        localStorage.removeItem('currentUserName');
+        showJoinScreen();
+        closeNewTripModal();
+      }
+    }
+    
+    function resetCurrentTrip() {
+      if (confirm('Θέλετε να επαναφέρετε το τρέχον ταξίδι; Θα διαγραφούν ΟΛΕΣ οι καταχωρήσεις.')) {
+        currentTrip.expenses = [];
+        expenses = [];
+        saveTripToStorage();
+        updateTotals();
+        closeNewTripModal();
+        showToast('Το ταξίδι επαναφέρθηκε', 'success');
+      }
     }
 
     // Κοινή χρήση
@@ -1710,19 +1895,6 @@
       showToast('Διαγράφηκαν όλες οι καταχωρήσεις', 'success');
     }
 
-    function leaveTrip() {
-      if (!confirm('Θέλετε να αποχωρήσετε από αυτό το ταξίδι; Όλες οι τοπικές καταχωρήσεις θα διαγραφούν.')) {
-        return;
-      }
-      
-      // Καθαρισμός localStorage
-      localStorage.removeItem('currentTripCode');
-      localStorage.removeItem('currentUserName');
-      
-      // Επαναφόρτωση
-      location.reload();
-    }
-
     // Tab navigation
     function switchTab(tabName) {
       document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1777,8 +1949,13 @@
     // Κλείσιμο modal όταν κλικάρεις έξω
     window.addEventListener('click', function(event) {
       const shareModal = document.getElementById('shareModal');
+      const newTripModal = document.getElementById('newTripModal');
+      
       if (event.target === shareModal) {
         closeShareModal();
+      }
+      if (event.target === newTripModal) {
+        closeNewTripModal();
       }
     });
   </script>
