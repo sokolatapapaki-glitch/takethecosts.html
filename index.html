@@ -85,25 +85,18 @@
     }
 
     .header-btn {
-     .header-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.header-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
-}
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
 
     .header-btn:hover {
       background: rgba(255, 255, 255, 0.3);
@@ -874,19 +867,17 @@
     <!-- Main App Screen -->
     <div id="appScreen" style="display: none;">
       <header>
-  <h1><i class="fas fa-receipt"></i> Travel Expense Tracker</h1>
-  <p class="tagline" id="tripTagline">Κοινή καταγραφή εξόδων</p>
-  <div class="header-buttons">
-    <button class="header-btn" onclick="showShareModal()" title="Κοινή χρήση">
-      <i class="fas fa-share-alt"></i>
-      <span class="btn-text">Κοινή</span>
-    </button>
-    <button class="header-btn" onclick="showNewTripModal()" title="Νέο ταξίδι">
-      <i class="fas fa-plus-circle"></i>
-      <span class="btn-text">Νέο</span>
-    </button>
-  </div>
-</header>
+        <h1><i class="fas fa-receipt"></i> Travel Expense Tracker</h1>
+        <p class="tagline" id="tripTagline">Κοινή καταγραφή εξόδων</p>
+        <div class="header-buttons">
+          <button class="header-btn" onclick="showShareModal()" title="Κοινή χρήση">
+            <i class="fas fa-share-alt"></i>
+          </button>
+          <button class="header-btn" onclick="showNewTripModal()" title="Νέο ταξίδι">
+            <i class="fas fa-plus-circle"></i>
+          </button>
+        </div>
+      </header>
 
       <!-- New Trip Modal -->
       <div id="newTripModal" class="modal">
@@ -1966,20 +1957,7 @@
       if (event.target === newTripModal) {
         closeNewTripModal();
       }
-    });+
-      /* Προσθήκη κειμένου στα κουμπιά header */
-.header-btn .btn-text {
-  font-size: 0.85rem;
-  margin-left: 4px;
-  font-weight: 500;
-}
-
-/* Σε πολύ μικρές οθόνες, κρύψε το κείμενο */
-@media (max-width: 400px) {
-  .header-btn .btn-text {
-    display: none;
-  }
-}
+    });
   </script>
 </body>
 </html>
