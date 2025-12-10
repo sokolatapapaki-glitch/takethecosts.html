@@ -1628,7 +1628,11 @@ function switchTab(tabName) {
     content.classList.remove('active');
   });
   
-  event.target.classList.add('active');
+  // ΔΙΟΡΘΩΣΗ: Πρόσθεσε event ως παράμετρο
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+  
   document.getElementById(tabName).classList.add('active');
   
   // ΕΑΝ ΕΙΝΑΙ Η ΚΑΡΤΕΛΑ ΤΑΞΙΔΙΑ, ΦΟΡΤΩΣΕ ΤΑ
