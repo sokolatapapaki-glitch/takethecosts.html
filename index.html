@@ -1367,7 +1367,31 @@
       // ΕΜΦΑΝΙΣΗ
       showApp();
       updateUI();
+        // ΒΗΜΑ 2: Έλεγχος για P2P data από URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const p2pDataEncoded = urlParams.get('p2p');
+  
+  if (p2pDataEncoded) {
+    try {
+      const decodedString = decodeURIComponent(atob(p2pDataEncoded));
+      const p2pData = JSON.parse(decodedString);
       
+      console.log("🔍 Βρέθηκαν P2P data:", p2pData);
+      
+      if (p2pData.peerId && p2pData.tripCode === currentTrip.code) {
+        console.log("🚀 Σύνδεση P2P στον host:", p2pData.peerId);
+        
+        // Σύνδεση ως guest στον host
+        setTimeout(() => {
+          if (window.p2pManager) {
+            p2pManager.initializeAsGuest(p2pData.peerId);
+          }
+        }, 2000);
+      }
+    } catch (err) {
+      console.error('Σφάλμα P2P data:', err);
+    }
+  }
       showToast(`Καλώς ήρθατε ${userName} στο ταξίδι "${currentTrip.name}"`, 'success');
     }
 
@@ -1666,32 +1690,62 @@ function switchTab(tabName, e) {
   console.log(`✅ Άλλαξε σε ${tabName}`);
 }
     // ΚΟΙΝΗ ΧΡΗΣΗ - QR CODE
-    function generateQRCode() {
-      if (!currentTrip) {
-        showToast('Δεν υπάρχει ενεργό ταξίδι', 'warning');
-        return;
+   function generateQRCode() {
+  if (!currentTrip) {
+    showToast('Δεν υπάρχει ενεργό ταξίδι', 'warning');
+    return;
+  }
+  
+  console.log("📡 Δημιουργία QR με P2P...");
+  
+  // Έλεγχος αν το P2P είναι έτοιμο
+  if (window.p2pManager && p2pManager.isConnected) {
+    console.log("✅ P2P ενεργό, δημιουργία QR με peerId:", p2pManager.peerId);
+    
+    // Δεδομένα για P2P σύνδεση
+    const qrData = {
+      tripCode: currentTrip.code,
+      peerId: p2pManager.peerId,
+      timestamp: Date.now(),
+      type: 'travel_p2p'
+    };
+    
+    // Κωδικοποίηση σε Base64
+    const jsonString = JSON.stringify(qrData);
+    const encodedData = btoa(encodeURIComponent(jsonString));
+    const shareUrl = `${window.location.origin}${window.location.pathname}?p2p=${encodedData}`;
+    
+    // Δημιουργία QR
+    document.getElementById('qrcode').innerHTML = '';
+    QRCode.toCanvas(document.getElementById('qrcode'), shareUrl, {
+      width: 200,
+      margin: 2
+    }, function(error) {
+      if (error) {
+        console.error(error);
+        showToast('Σφάλμα δημιουργίας QR', 'danger');
+      } else {
+        showToast('✅ QR με Real-time P2P!', 'success');
       }
-      
-      // ΠΟΛΥ ΑΠΛΟΣ ΣΥΝΔΕΣΜΟΣ - μόνο ο κωδικός
-      const shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}`;
-      
-      // Καθαρισμός
-      document.getElementById('qrcode').innerHTML = '';
-      
-      // Δημιουργία QR
-      QRCode.toCanvas(document.getElementById('qrcode'), shareUrl, {
-        width: 200,
-        margin: 2
-      }, function(error) {
-        if (error) {
-          console.error(error);
-          showToast('Σφάλμα δημιουργίας QR', 'danger');
-        }
-      });
-      
-      // Αποθήκευση στο share link
-      document.getElementById('shareLink').value = shareUrl;
-    }
+    });
+    
+    document.getElementById('shareLink').value = shareUrl;
+    
+  } else {
+    // Fallback: παλιό QR χωρίς P2P
+    console.log("📴 P2P όχι έτοιμο, offline QR");
+    const shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}&user=${encodeURIComponent(currentUser)}`;
+    
+    document.getElementById('qrcode').innerHTML = '';
+    QRCode.toCanvas(document.getElementById('qrcode'), shareUrl, {
+      width: 200,
+      margin: 2
+    });
+    
+    document.getElementById('shareLink').value = shareUrl;
+    showToast('QR χωρίς real-time', 'info');
+  }
+}
 
     function shareViaQR() {
       document.getElementById('qrContainer').style.display = 'flex';
