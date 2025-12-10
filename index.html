@@ -1990,20 +1990,48 @@ function switchTab(tabName, e) {
     }
     
     function switchTab(tabName) {
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
-      
-      event.target.classList.add('active');
-      document.getElementById(tabName).classList.add('active');
-      
-      if (tabName === 'summary') {
-        setTimeout(updateChart, 100);
-      }
+  console.log(`🔄 Αλλαγή σε καρτέλα: ${tabName}`);
+  
+  // 1. Απενεργοποίηση όλων των tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.remove('active');
+  });
+  
+  // 2. Ενεργοποίηση του κουμπιού (ΧΩΡΙΣ χρήση event.target)
+  const allTabBtns = document.querySelectorAll('.tab-btn');
+  for (let btn of allTabBtns) {
+    const btnText = btn.textContent || btn.innerText || '';
+    if (btnText.includes(
+      tabName === 'tracker' ? 'Καταχώρηση' :
+      tabName === 'summary' ? 'Σύνοψη' :
+      tabName === 'expenses' ? 'Καταχωρήσεις' :
+      tabName === 'trips' ? 'Ταξίδια' :
+      'Ρυθμίσεις'
+    )) {
+      btn.classList.add('active');
+      break;
     }
+  }
+  
+  // 3. Ενεργοποίηση του περιεχομένου
+  document.getElementById(tabName).classList.add('active');
+  
+  // 4. Ειδικές ενέργειες ανά καρτέλα
+  if (tabName === 'trips') {
+    console.log("📂 Φόρτωση ταξιδιών...");
+    loadMyTrips();
+  }
+  
+  if (tabName === 'summary') {
+    setTimeout(updateChart, 100);
+  }
+  
+  console.log(`✅ Άλλαξε σε ${tabName}`);
+}
     
     function updateChart() {
       const ctx = document.getElementById('categoryChart').getContext('2d');
