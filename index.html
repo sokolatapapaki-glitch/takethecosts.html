@@ -1691,10 +1691,13 @@ const encodedData = btoa(encodeURIComponent(jsonString));
     }
 
     // Συγχρονισμός
-    function startAutoSync() {
-      // Συγχρονισμός κάθε 30 δευτερόλεπτα
-      syncInterval = setInterval(syncData, 30000);
-    }
+   function startAutoSync() {
+  // ΒΗΜΑ 13: Πιο γρήγορος sync για καλύτερη εμπειρία
+  syncInterval = setInterval(syncData, 10000); // 10 δευτερόλεπτα
+  
+  // Άμεσος συγχρονισμός
+  setTimeout(syncData, 1000);
+}
 
     function manualSync() {
       syncData();
@@ -1702,47 +1705,69 @@ const encodedData = btoa(encodeURIComponent(jsonString));
     }
 
     function syncData() {
-      if (!currentTrip) return;
-      
-      const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
-      const serverTrip = allTrips[currentTrip.code];
-      
-      if (!serverTrip) return;
-      
-      // Συγχρονισμός εξόδων (κρατάμε τα πιο πρόσφατα)
-      const serverExpenses = serverTrip.expenses || [];
-      const localExpenses = expenses;
-      
-      // Δημιουργία Map για εύκολη σύγκριση
-      const expenseMap = new Map();
-      
-      // Προσθήκη server expenses
-      serverExpenses.forEach(exp => {
-        expenseMap.set(exp.id, exp);
-      });
-      
-      // Προσθήκη/επαναφορά local expenses (ανεβάζουν τα νεότερα)
-      localExpenses.forEach(exp => {
-        const existing = expenseMap.get(exp.id);
-        if (!existing || new Date(exp.updated || exp.created) > new Date(existing.updated || existing.created)) {
-          expenseMap.set(exp.id, exp);
-        }
-      });
-      
-      // Ενημέρωση δεδομένων
-      const syncedExpenses = Array.from(expenseMap.values());
-      currentTrip.expenses = syncedExpenses;
-      expenses = syncedExpenses;
-      
-      // Αποθήκευση
-      saveTripToStorage();
-      
-      // Ενημέρωση UI
-      updateTotals();
-      
-      // Ενημέρωση status
-      document.getElementById('syncStatus').textContent = `Ενημερώθηκε ${new Date().toLocaleTimeString('el-GR', {hour: '2-digit', minute:'2-digit'})}`;
+  if (!currentTrip) return;
+  
+  // ΒΗΜΑ 13: HYBRID SYNC (P2P + LocalStorage)
+  console.log('🔄 Συγχρονισμός δεδομένων...');
+  
+  const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
+  const storedTrip = allTrips[currentTrip.code];
+  
+  if (!storedTrip) {
+    // Αποθήκευση για πρώτη φορά
+    saveTripToStorage();
+    return;
+  }
+  
+  // Συγχωνευση εξόδων
+  const storedExpenses = storedTrip.expenses || [];
+  const localExpenses = expenses;
+  
+  // Δημιουργία Map για εύκολη σύγκριση
+  const expenseMap = new Map();
+  
+  // Προσθήκη stored expenses
+  storedExpenses.forEach(exp => {
+    expenseMap.set(exp.id, exp);
+  });
+  
+  // Προσθήκη local expenses (αν είναι πιο πρόσφατα)
+  localExpenses.forEach(exp => {
+    const existing = expenseMap.get(exp.id);
+    if (!existing || new Date(exp.updated || exp.created) > new Date(existing.updated || existing.created)) {
+      expenseMap.set(exp.id, exp);
     }
+  });
+  
+  // Ενημέρωση
+  const syncedExpenses = Array.from(expenseMap.values());
+  currentTrip.expenses = syncedExpenses;
+  expenses = syncedExpenses;
+  
+  // Αποθήκευση
+  saveTripToStorage();
+  
+  // Ενημέρωση UI
+  updateTotals();
+  
+  // Ενημέρωση status
+  const now = new Date();
+  const timeString = now.toLocaleTimeString('el-GR', {hour: '2-digit', minute:'2-digit'});
+  
+  if (p2pManager && p2pManager.isConnected && p2pManager.connections.size > 0) {
+    document.getElementById('syncStatus').innerHTML = `
+      <div class="sync-pulse" style="background: #10b981;"></div>
+      <span>✅ Real-time (${p2pManager.connections.size} άτομα) ${timeString}</span>
+    `;
+  } else {
+    document.getElementById('syncStatus').innerHTML = `
+      <div class="sync-pulse" style="background: #f59e0b; animation: none;"></div>
+      <span>💾 Offline sync ${timeString}</span>
+    `;
+  }
+  
+  console.log('✅ Συγχρονίστηκαν', syncedExpenses.length, 'εξόδων');
+}
 
     // Καταχώρηση εξόδων
     function renderCategories() {
