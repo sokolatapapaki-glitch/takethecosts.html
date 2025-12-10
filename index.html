@@ -424,12 +424,12 @@
     }
 
     /* Category Buttons */
-    .categories-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
-    }
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
 
     .category-btn {
       padding: 16px 12px;
@@ -740,6 +740,15 @@
       .categories-grid {
         grid-template-columns: repeat(2, 1fr);
       }
+      .category-btn {
+    padding: 14px 8px;
+    font-size: 0.85rem;
+  }
+  
+  .category-btn .emoji {
+    font-size: 1.5rem;
+  }
+}
 
       .expense-meta {
         flex-direction: column;
@@ -1019,16 +1028,23 @@
             <div class="form-group" style="flex: 1;">
               <label for="expenseCategory">Κατηγορία</label>
               <select id="expenseCategory">
-                <option value="Πρωινό">Πρωινό 🥐</option>
-                <option value="Μεσημεριανό">Μεσημεριανό 🍝</option>
-                <option value="Βραδινό">Βραδινό 🍲</option>
-                <option value="Σνακ">Σνακ 🍦</option>
-                <option value="Δώρα">Δώρα 🎁</option>
-                <option value="Μέσα Μεταφοράς">Μέσα Μεταφοράς 🚌</option>
-                <option value="Αξιοθέατο">Αξιοθέατο 🏛️</option>
-                <option value="Ξενοδοχείο">Ξενοδοχείο 🏨</option>
-                <option value="Έκτακτο">Έκτακτο 💡</option>
-              </select>
+  <option value="Πρωινό">Πρωινό 🥐</option>
+  <option value="Μεσημεριανό">Μεσημεριανό 🍝</option>
+  <option value="Βραδινό">Βραδινό 🍲</option>
+  <option value="Σνακ">Σνακ 🍦</option>
+  <option value="Δώρα">Δώρα 🎁</option>
+  <option value="Μέσα Μεταφοράς">Μέσα Μεταφοράς 🚌</option>
+  <option value="Αεροπορικά">Αεροπορικά ✈️</option>
+  <option value="Ενοικίαση Αυτοκινήτου">Ενοικίαση Αυτοκινήτου 🚗</option>
+  <option value="Ταξί">Ταξί 🚕</option>
+  <option value="Κρουαζιέρα">Κρουαζιέρα 🚢</option>
+  <option value="Αξιοθέατο">Αξιοθέατο 🏛️</option>
+  <option value="Μουσείο">Μουσείο 🏛️</option>
+  <option value="Ξενοδοχείο">Ξενοδοχείο 🏨</option>
+  <option value="Airbnb">Airbnb 🏠</option>
+  <option value="Ασφάλεια Ταξιδιού">Ασφάλεια Ταξιδιού 🛡️</option>
+  <option value="Έκτακτο">Έκτακτο 💡</option>
+</select>
             </div>
             
             <div class="form-group" style="flex: 1;">
@@ -1166,18 +1182,25 @@
     // ΚΟΙΝΗ ΧΡΗΣΗ ΜΕ QR CODE ΚΑΙ ΚΩΔΙΚΟ
     // ============================================
     
-    // Κατηγορίες
-    let categories = [
-      { name: "Πρωινό", emoji: "🥐", color: "#f59e0b" },
-      { name: "Μεσημεριανό", emoji: "🍝", color: "#10b981" },
-      { name: "Βραδινό", emoji: "🍲", color: "#8b5cf6" },
-      { name: "Σνακ", emoji: "🍦", color: "#ec4899" },
-      { name: "Δώρα", emoji: "🎁", color: "#ef4444" },
-      { name: "Μέσα Μεταφοράς", emoji: "🚌", color: "#3b82f6" },
-      { name: "Αξιοθέατο", emoji: "🏛️", color: "#14b8a6" },
-      { name: "Ξενοδοχείο", emoji: "🏨", color: "#8b5cf6" },
-      { name: "Έκτακτο", emoji: "💡", color: "#f97316" }
-    ];
+   // Κατηγορίες
+let categories = [
+  { name: "Πρωινό", emoji: "🥐", color: "#f59e0b" },
+  { name: "Μεσημεριανό", emoji: "🍝", color: "#10b981" },
+  { name: "Βραδινό", emoji: "🍲", color: "#8b5cf6" },
+  { name: "Σνακ", emoji: "🍦", color: "#ec4899" },
+  { name: "Δώρα", emoji: "🎁", color: "#ef4444" },
+  { name: "Μέσα Μεταφοράς", emoji: "🚌", color: "#3b82f6" },
+  { name: "Αεροπορικά", emoji: "✈️", color: "#06b6d4" },
+  { name: "Ενοικίαση Αυτοκινήτου", emoji: "🚗", color: "#8b5cf6" },
+  { name: "Ταξί", emoji: "🚕", color: "#f59e0b" },
+  { name: "Κρουαζιέρα", emoji: "🚢", color: "#3b82f6" },
+  { name: "Αξιοθέατο", emoji: "🏛️", color: "#14b8a6" },
+  { name: "Μουσείο", emoji: "🏛️", color: "#10b981" },
+  { name: "Ξενοδοχείο", emoji: "🏨", color: "#8b5cf6" },
+  { name: "Airbnb", emoji: "🏠", color: "#ef4444" },
+  { name: "Ασφάλεια Ταξιδιού", emoji: "🛡️", color: "#64748b" },
+  { name: "Έκτακτο", emoji: "💡", color: "#f97316" }
+];
 
     // Μεταβλητές
     let currentTrip = null;
