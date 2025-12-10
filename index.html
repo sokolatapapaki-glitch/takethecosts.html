@@ -1446,8 +1446,39 @@
       const tripCode = generateTripCode();
       
       // Ανακατεύθυνση με τον νέο κωδικό
+        // ΑΠΟΘΗΚΕΥΣΗ ΣΤΟ LOCALSTORAGE ΠΡΙΝ ΤΟ REDIRECT
+  const tempTrip = {
+    code: tripCode,
+    name: tripName,
+    creator: userName,
+    created: new Date().toISOString(),
+    members: [userName],
+    expenses: []
+  };
+  
+  const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
+  allTrips[tripCode] = tempTrip;
+  localStorage.setItem('allTrips', JSON.stringify(allTrips));
+  localStorage.setItem('currentTripCode', tripCode);
+  localStorage.setItem('currentUserName', userName);
+  
+  // ΕΝΕΡΓΟΠΟΙΗΣΗ P2P ΩΣ HOST (πριν το redirect)
+  if (window.p2pManager) {
+    console.log("🎯 Ξεκινάει P2P ως host για το ταξίδι:", tripCode);
+    p2pManager.initializeAsHost(tripCode).then(() => {
+      // Αφού γίνει initialize, κάνε redirect
       const joinUrl = `${window.location.origin}${window.location.pathname}?trip=${tripCode}&user=${encodeURIComponent(userName)}&tripname=${encodeURIComponent(tripName)}`;
       window.location.href = joinUrl;
+    }).catch(() => {
+      // Fallback αν αποτύχει το P2P
+      const joinUrl = `${window.location.origin}${window.location.pathname}?trip=${tripCode}&user=${encodeURIComponent(userName)}&tripname=${encodeURIComponent(tripName)}`;
+      window.location.href = joinUrl;
+    });
+  } else {
+    // Fallback χωρίς P2P
+    const joinUrl = `${window.location.origin}${window.location.pathname}?trip=${tripCode}&user=${encodeURIComponent(userName)}&tripname=${encodeURIComponent(tripName)}`;
+    window.location.href = joinUrl;
+  }
     }
 
     // ΣΥΝΔΕΣΗ ΣΕ ΥΠΑΡΧΟΝ ΤΑΞΙΔΙ
