@@ -1824,6 +1824,14 @@ function switchTab(tabName, e) {
       // ΑΠΟΘΗΚΕΥΣΗ
       saveTripToStorage();
       updateTotals();
+        // ΑΠΟΣΤΟΛΗ ΜΕΣΩ P2P
+  if (window.p2pManager && p2pManager.isConnected && p2pManager.connections.size > 0) {
+    console.log("📤 Αποστολή έξοδου via P2P:", newExpense);
+    p2pManager.broadcastExpense(newExpense);
+    showToast(`Προστέθηκε έξοδο (real-time)`, 'success');
+  } else {
+    showToast(`Προστέθηκε έξοδο (offline)`, 'success');
+  }
       
       showToast(`Προστέθηκε έξοδο ${category}: ${amount.toFixed(2)} €`, 'success');
       
@@ -1912,7 +1920,11 @@ document.getElementById('userSummary').innerHTML = Object.entries(byUser).length
       
       saveTripToStorage();
       updateTotals();
-      
+        // ΑΠΟΣΤΟΛΗ ΔΙΑΓΡΑΦΗΣ ΜΕΣΩ P2P
+  if (window.p2pManager && p2pManager.isConnected && p2pManager.connections.size > 0) {
+    console.log("🗑️ Αποστολή διαγραφής via P2P:", expense.id);
+    p2pManager.broadcastDelete(expense.id);
+  }
       showToast(`Διαγράφηκε έξοδο ${expense.category}`, 'danger');
     }
 
