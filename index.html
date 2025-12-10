@@ -1370,29 +1370,41 @@
     }
 
     // ΕΛΕΓΧΟΣ ΑΠΟΘΗΚΕΥΜΕΝΟΥ ΤΑΞΙΔΙΟΥ
-    function checkSavedTrip() {
-      const savedTripCode = localStorage.getItem('currentTripCode');
-      const savedUserName = localStorage.getItem('currentUserName');
+   function checkSavedTrip() {
+  console.log("🔍 Έλεγχος για αποθηκευμένο ταξίδι...");
+  
+  const savedTripCode = localStorage.getItem('currentTripCode');
+  const savedUserName = localStorage.getItem('currentUserName');
+  
+  console.log("savedTripCode:", savedTripCode);
+  console.log("savedUserName:", savedUserName);
+  
+  if (savedTripCode && savedUserName) {
+    const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
+    console.log("allTrips keys:", Object.keys(allTrips));
+    
+    if (allTrips[savedTripCode]) {
+      console.log("✅ Βρέθηκε αποθηκευμένο ταξίδι!");
+      currentTrip = allTrips[savedTripCode];
+      currentUser = savedUserName;
+      expenses = currentTrip.expenses || [];
       
-      if (savedTripCode && savedUserName) {
-        const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
-        
-        if (allTrips[savedTripCode]) {
-          currentTrip = allTrips[savedTripCode];
-          currentUser = savedUserName;
-          expenses = currentTrip.expenses || [];
-          
-          showApp();
-          updateUI();
-          return;
-        }
-      }
-      
-      // ΔΕΝ ΒΡΕΘΗΚΕ ΤΑΞΙΔΙ - ΕΜΦΑΝΙΣΗ SETUP
-      setupScreen.style.display = 'block';
-      joinScreen.style.display = 'none';
-      appScreen.style.display = 'none';
+      showApp();
+      updateUI();
+      return;
+    } else {
+      console.log("❌ Το ταξίδι δεν υπάρχει στο allTrips");
     }
+  } else {
+    console.log("❌ Δεν βρέθηκαν αποθηκευμένα credentials");
+  }
+  
+  // ΔΕΝ ΒΡΕΘΗΚΕ ΤΑΞΙΔΙ - ΕΜΦΑΝΙΣΗ SETUP
+  console.log("📱 Εμφάνιση setup screen");
+  setupScreen.style.display = 'block';
+  joinScreen.style.display = 'none';
+  appScreen.style.display = 'none';
+}
 
     // ΔΗΜΙΟΥΡΓΙΑ ΝΕΟΥ ΤΑΞΙΔΙΟΥ (από κουμπί)
     function createNewTrip() {
