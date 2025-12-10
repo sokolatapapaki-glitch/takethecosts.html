@@ -1621,6 +1621,7 @@ function deleteTrip(tripCode) {
 
 // 4. Μόλις αλλάξεις καρτέλα, φόρτωσε τα ταξίδια
 function switchTab(tabName) {
+  // 1. Απενεργοποίηση όλων των tabs
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.remove('active');
   });
@@ -1628,14 +1629,20 @@ function switchTab(tabName) {
     content.classList.remove('active');
   });
   
-  // ΔΙΟΡΘΩΣΗ: Πρόσθεσε event ως παράμετρο
-  if (event && event.target) {
-    event.target.classList.add('active');
-  }
+  // 2. Ενεργοποίηση του επιλεγμένου tab
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    if (btn.textContent.includes(tabName === 'tracker' ? 'Καταχώρηση' : 
+                                 tabName === 'summary' ? 'Σύνοψη' :
+                                 tabName === 'expenses' ? 'Καταχωρήσεις' :
+                                 tabName === 'trips' ? 'Ταξίδια' :
+                                 'Ρυθμίσεις')) {
+      btn.classList.add('active');
+    }
+  });
   
   document.getElementById(tabName).classList.add('active');
   
-  // ΕΑΝ ΕΙΝΑΙ Η ΚΑΡΤΕΛΑ ΤΑΞΙΔΙΑ, ΦΟΡΤΩΣΕ ΤΑ
+  // 3. Ειδικές ενέργειες ανά καρτέλα
   if (tabName === 'trips') {
     loadMyTrips();
   }
