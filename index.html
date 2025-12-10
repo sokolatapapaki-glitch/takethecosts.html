@@ -106,7 +106,7 @@
       transform: scale(1.1);
     }
 
-    /* New Trip Button - More visible */
+    /* New Trip Button */
     .new-trip-btn {
       background: rgba(255, 255, 255, 0.3);
       border: 2px solid white;
@@ -850,6 +850,28 @@
     #myTripsList::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
+    
+    /* P2P Status Indicator */
+    .p2p-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      margin-left: 8px;
+    }
+    
+    .p2p-connected {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+    }
+    
+    .p2p-disconnected {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
   </style>
 </head>
 <body>
@@ -928,12 +950,19 @@
           <button class="header-btn" onclick="showShareModal()" title="Κοινή χρήση">
             <i class="fas fa-share-alt"></i>
           </button>
+          <button class="header-btn" onclick="forceSync()" title="Εξαναγκασμός συγχρονισμού">
+            <i class="fas fa-sync-alt"></i>
+          </button>
           <button class="header-btn" onclick="showNewTripModal()" title="Νέο ταξίδι">
             <i class="fas fa-plus-circle"></i>
           </button>
-          <button class="header-btn" onclick="testP2PConnection()" title="Test P2P">
+          <button class="header-btn" onclick="testP2PConnection()" title="Κατάσταση P2P">
             <i class="fas fa-wifi"></i>
           </button>
+        </div>
+        <div id="p2pStatus" class="p2p-status p2p-disconnected" style="display: none;">
+          <i class="fas fa-circle"></i>
+          <span>P2P: Offline</span>
         </div>
       </header>
 
@@ -971,21 +1000,6 @@
               </p>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Trip Info -->
-      <div class="trip-info">
-        <div class="trip-details">
-          <h2 id="currentTripTitle">Ταξίδι</h2>
-          <div class="members-badges" id="currentMembers"></div>
-        </div>
-        <div class="sync-status">
-          <div class="sync-pulse"></div>
-          <span id="syncStatus">Συγχρονισμένο</span>
-          <button class="btn btn-sm btn-info" onclick="manualSync()" style="margin-left: 8px;">
-            <i class="fas fa-sync-alt"></i>
-          </button>
         </div>
       </div>
 
@@ -1043,16 +1057,45 @@
               </div>
             </div>
           </div>
+          
+          <div style="margin-top: 20px; padding: 16px; background: #f0f9ff; border-radius: var(--radius);">
+            <h3><i class="fas fa-info-circle"></i> Οδηγίες Σύνδεσης:</h3>
+            <p style="font-size: 0.9rem; margin-top: 8px;">
+              1. Ο δημιουργός πατάει "QR Code"<br>
+              2. Οι φίλοι σκανάρουν το QR με την κάμερά τους<br>
+              3. Η εφαρμογή ανοίγει αυτόματα και συνδέεται<br>
+              4. Όλοι βλέπουν τα ίδια έξοδα σε πραγματικό χρόνο!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trip Info -->
+      <div class="trip-info">
+        <div class="trip-details">
+          <h2 id="currentTripTitle">Ταξίδι</h2>
+          <div class="members-badges" id="currentMembers"></div>
+        </div>
+        <div class="sync-status">
+          <div class="sync-pulse"></div>
+          <span id="syncStatus">Συγχρονισμένο</span>
+          <button class="btn btn-sm btn-info" onclick="manualSync()" style="margin-left: 8px;">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+          <div id="liveSyncStatus" class="p2p-status p2p-disconnected" style="margin-left: 8px;">
+            <i class="fas fa-circle"></i>
+            <span>Offline</span>
+          </div>
         </div>
       </div>
 
       <!-- Tab Navigation -->
       <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('tracker')"><i class="fas fa-plus-circle"></i> Καταχώρηση</button>
-        <button class="tab-btn" onclick="switchTab('summary')"><i class="fas fa-chart-pie"></i> Σύνοψη</button>
-        <button class="tab-btn" onclick="switchTab('expenses')"><i class="fas fa-list"></i> Καταχωρήσεις</button>
-        <button class="tab-btn" onclick="switchTab('trips')"><i class="fas fa-suitcase"></i> Ταξίδια Μου</button>
-        <button class="tab-btn" onclick="switchTab('settings')"><i class="fas fa-cog"></i> Ρυθμίσεις</button>
+        <button class="tab-btn active" data-tab="tracker"><i class="fas fa-plus-circle"></i> Καταχώρηση</button>
+        <button class="tab-btn" data-tab="summary"><i class="fas fa-chart-pie"></i> Σύνοψη</button>
+        <button class="tab-btn" data-tab="expenses"><i class="fas fa-list"></i> Καταχωρήσεις</button>
+        <button class="tab-btn" data-tab="trips"><i class="fas fa-suitcase"></i> Ταξίδια Μου</button>
+        <button class="tab-btn" data-tab="settings"><i class="fas fa-cog"></i> Ρυθμίσεις</button>
       </div>
 
       <!-- Tracker Tab -->
@@ -1238,6 +1281,28 @@
             </div>
           </div>
           
+          <div class="form-group">
+            <label><i class="fas fa-wifi"></i> Ρυθμίσεις P2P Συγχρονισμού</label>
+            <div style="padding: 12px; background: #f8fafc; border-radius: 8px; margin-top: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span>Κατάσταση:</span>
+                <span id="p2pStatusText" style="font-weight: bold;">Άγνωστο</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span>Συνδέσεις:</span>
+                <span id="p2pConnectionsText">0</span>
+              </div>
+              <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button class="btn btn-info" onclick="forceSync()" style="flex: 1;">
+                  <i class="fas fa-sync-alt"></i> Εξαναγκασμός Συγχρονισμού
+                </button>
+                <button class="btn btn-warning" onclick="reconnectP2P()" style="flex: 1;">
+                  <i class="fas fa-redo"></i> Επανασύνδεση
+                </button>
+              </div>
+            </div>
+          </div>
+          
           <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" onclick="saveSettings()">
             <i class="fas fa-save"></i> Αποθήκευση Ρυθμίσεων
           </button>
@@ -1283,6 +1348,8 @@
     let currentUser = null;
     let expenses = [];
     let chart = null;
+    let p2pCheckInterval = null;
+    let pendingBroadcasts = [];
 
     // DOM Elements
     const setupScreen = document.getElementById('setupScreen');
@@ -1293,6 +1360,14 @@
     // ΑΡΧΙΚΟΠΟΙΗΣΗ
     document.addEventListener('DOMContentLoaded', function() {
       console.log("🚀 Εφαρμογή φορτώθηκε!");
+      
+      // Προσθέστε event listeners για τα tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const tabName = this.getAttribute('data-tab');
+          switchTab(tabName);
+        });
+      });
       
       // Έλεγχος URL για κωδικό
       const urlParams = new URLSearchParams(window.location.search);
@@ -1336,7 +1411,8 @@
           creator: userName,
           created: new Date().toISOString(),
           members: [userName],
-          expenses: []
+          expenses: [],
+          p2pHostId: null
         };
         
         allTrips[tripCode] = currentTrip;
@@ -1372,51 +1448,10 @@
       showApp();
       updateUI();
       
-      // ΒΗΜΑ 2: Έλεγχος για P2P data από URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const p2pDataEncoded = urlParams.get('p2p');
-      const hostPeerId = urlParams.get('host');
-      
-      if (hostPeerId) {
-        console.log("👤 Σύνδεση ως guest στον host:", hostPeerId);
-        setTimeout(() => {
-          if (window.p2pManager) {
-            p2pManager.initializeAsGuest(hostPeerId)
-              .then(() => {
-                showToast('Συνδεθήκατε με real-time sync!', 'success');
-              })
-              .catch(err => {
-                console.error("P2P guest connection failed:", err);
-              });
-          }
-        }, 1000);
-      } else if (p2pDataEncoded) {
-        try {
-          const decodedString = decodeURIComponent(atob(p2pDataEncoded));
-          const p2pData = JSON.parse(decodedString);
-          
-          console.log("🔍 Βρέθηκαν P2P data:", p2pData);
-          
-          if (p2pData.peerId && p2pData.tripCode === currentTrip.code) {
-            console.log("🚀 Σύνδεση P2P στον host:", p2pData.peerId);
-            
-            // Σύνδεση ως guest στον host
-            setTimeout(() => {
-              if (window.p2pManager) {
-                p2pManager.initializeAsGuest(p2pData.peerId)
-                  .then(() => {
-                    showToast('Συνδεθήκατε με QR!', 'success');
-                  })
-                  .catch(err => {
-                    console.error('Σφάλμα P2P connection:', err);
-                  });
-              }
-            }, 1500);
-          }
-        } catch (err) {
-          console.error('Σφάλμα P2P data:', err);
-        }
-      }
+      // ΕΝΕΡΓΟΠΟΙΗΣΗ P2P ΣΥΝΔΕΣΗΣ
+      setTimeout(() => {
+        initializeP2PConnection();
+      }, 1500);
       
       showToast(`Καλώς ήρθατε ${userName} στο ταξίδι "${currentTrip.name}"`, 'success');
     }
@@ -1444,21 +1479,10 @@
           showApp();
           updateUI();
           
-          // Αν είναι ο δημιουργός, ξεκινήστε P2P ως host
-          if (currentTrip.creator === currentUser) {
-            setTimeout(() => {
-              console.log("🏁 Αρχικοποίηση P2P ως host...");
-              if (window.p2pManager) {
-                p2pManager.initializeAsHost(currentTrip.code)
-                  .then(() => {
-                    console.log("✅ P2P Host ready");
-                  })
-                  .catch(err => {
-                    console.error("Host P2P failed:", err);
-                  });
-              }
-            }, 2000);
-          }
+          // ΕΝΕΡΓΟΠΟΙΗΣΗ P2P ΣΥΝΔΕΣΗΣ
+          setTimeout(() => {
+            initializeP2PConnection();
+          }, 1500);
           return;
         } else {
           console.log("❌ Το ταξίδι δεν υπάρχει στο allTrips");
@@ -1474,6 +1498,133 @@
       appScreen.style.display = 'none';
     }
 
+    // ΠΡΟΣΘΗΚΗ ΑΥΤΟΜΑΤΟΥ P2P MANAGEMENT
+    function initializeP2PConnection() {
+      console.log("🔧 Αρχικοποίηση P2P...");
+      
+      if (!currentTrip || !currentUser) {
+        console.log("⚠️ Δεν υπάρχει ενεργό ταξίδι ή χρήστης");
+        return;
+      }
+      
+      // Ελέγχουμε αν είμαστε ο δημιουργός του ταξιδιού
+      const isCreator = currentTrip.creator === currentUser;
+      console.log(`👤 Είμαι ${isCreator ? 'ΔΗΜΙΟΥΡΓΟΣ' : 'GUEST'} του ταξιδιού`);
+      
+      // Αναμονή για να φορτώσει το DOM
+      setTimeout(() => {
+        if (!window.p2pManager) {
+          console.error("❌ P2P Manager δεν είναι διαθέσιμο");
+          updateP2PStatus(false, "P2P Manager not available");
+          return;
+        }
+        
+        // Αν είμαστε ο δημιουργός, ξεκινάμε ως host
+        if (isCreator && (!p2pManager.isConnected || !p2pManager.peerId)) {
+          console.log("🏁 Ξεκινάω P2P ως HOST...");
+          updateP2PStatus(false, "Σύνδεση ως Host...");
+          
+          p2pManager.initializeAsHost(currentTrip.code)
+            .then(peerId => {
+              console.log("✅ Host έτοιμος με Peer ID:", peerId);
+              updateP2PStatus(true, `Host (${peerId.substring(0, 6)}...)`);
+              showToast("Real-time sync ενεργοποιήθηκε (Host)", 'success');
+              
+              // Ενημέρωση URL με το peerId για ευκολότερη σύνδεση
+              updateUrlWithPeerId(peerId);
+              
+              // Αποστολή εκκρεμών broadcast
+              processPendingBroadcasts();
+            })
+            .catch(err => {
+              console.error("❌ Σφάλμα Host P2P:", err);
+              updateP2PStatus(false, "Host failed: " + err.message);
+              showToast("P2P sync απέτυχε, χρησιμοποιείται offline", 'warning');
+            });
+        } 
+        // Αν είμαστε guest, προσπαθούμε να βρούμε host από το URL
+        else if (!isCreator && (!p2pManager.isConnected || !p2pManager.peerId)) {
+          const urlParams = new URLSearchParams(window.location.search);
+          const hostPeerId = urlParams.get('host');
+          
+          if (hostPeerId) {
+            console.log("🔗 Σύνδεση ως guest στον host:", hostPeerId);
+            updateP2PStatus(false, "Σύνδεση με host...");
+            
+            p2pManager.initializeAsGuest(hostPeerId)
+              .then(() => {
+                console.log("✅ Συνδεθήκαμε ως guest!");
+                updateP2PStatus(true, "Συνδεδεμένος");
+                showToast("Συνδεθήκατε με real-time sync", 'success');
+              })
+              .catch(err => {
+                console.error("❌ Σφάλμα Guest P2P:", err);
+                updateP2PStatus(false, "Σφάλμα σύνδεσης");
+                showToast("Δεν ήταν δυνατή η σύνδεση με host", 'warning');
+                
+                // Προσπάθεια auto-discovery
+                attemptAutoDiscoverHost();
+              });
+          } else {
+            console.log("ℹ️ Δεν βρέθηκε host στο URL, προσπαθώ auto-discovery");
+            attemptAutoDiscoverHost();
+          }
+        } else if (p2pManager.isConnected) {
+          console.log("✅ P2P είναι ήδη ενεργό");
+          updateP2PStatus(true, p2pManager.isHost ? "Host" : "Guest");
+        }
+      }, 1000);
+      
+      // Ξεκινάμε περιοδικό έλεγχο σύνδεσης
+      if (!p2pCheckInterval) {
+        p2pCheckInterval = setInterval(checkP2PConnection, 10000);
+      }
+    }
+
+    // Συνάρτηση για προσπάθεια auto-discovery του host
+    function attemptAutoDiscoverHost() {
+      console.log("🔍 Προσπάθεια auto-discovery host...");
+      updateP2PStatus(false, "Αναζήτηση host...");
+      
+      // Έλεγχος localStorage για πιθανό host peerId
+      const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
+      const thisTrip = allTrips[currentTrip.code];
+      
+      if (thisTrip && thisTrip.p2pHostId) {
+        console.log("🎯 Βρέθηκε αποθηκευμένο host peerId:", thisTrip.p2pHostId);
+        
+        p2pManager.initializeAsGuest(thisTrip.p2pHostId)
+          .then(() => {
+            console.log("✅ Συνδεθήκαμε μέσω αποθηκευμένου peerId!");
+            updateP2PStatus(true, "Συνδεδεμένος (αποθηκευμένο)");
+            showToast("Συνδεθήκατε με real-time sync", 'success');
+          })
+          .catch(err => {
+            console.error("❌ Σφάλμα σύνδεσης:", err);
+            updateP2PStatus(false, "Αποτυχία auto-discovery");
+          });
+      } else {
+        console.log("❌ Δεν βρέθηκε host για auto-discovery");
+        updateP2PStatus(false, "Χωρίς σύνδεση");
+      }
+    }
+
+    // Ενημέρωση URL με peerId για εύκολο sharing
+    function updateUrlWithPeerId(peerId) {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set('host', peerId);
+      
+      const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+      window.history.replaceState({}, '', newUrl);
+      
+      // Αποθήκευση του peerId για μελλοντική χρήση
+      const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
+      if (allTrips[currentTrip.code]) {
+        allTrips[currentTrip.code].p2pHostId = peerId;
+        localStorage.setItem('allTrips', JSON.stringify(allTrips));
+      }
+    }
+
     // ΔΗΜΙΟΥΡΓΙΑ ΝΕΟΥ ΤΑΞΙΔΙΟΥ (από κουμπί)
     function createNewTrip() {
       const tripName = document.getElementById('setupTripName').value.trim();
@@ -1487,8 +1638,7 @@
       // Δημιουργία μοναδικού κωδικού
       const tripCode = generateTripCode();
       
-      // Ανακατεύθυνση με τον νέο κωδικό
-      // ΑΠΟΘΗΚΕΥΣΗ ΣΤΟ LOCALSTORAGE ΠΡΙΝ ΤΟ REDIRECT
+      // Δημιουργούμε ένα προσωρινό ταξίδι για P2P
       const tempTrip = {
         code: tripCode,
         name: tripName,
@@ -1504,23 +1654,9 @@
       localStorage.setItem('currentTripCode', tripCode);
       localStorage.setItem('currentUserName', userName);
       
-      // ΕΝΕΡΓΟΠΟΙΗΣΗ P2P ΩΣ HOST (πριν το redirect)
-      if (window.p2pManager) {
-        console.log("🎯 Ξεκινάει P2P ως host για το ταξίδι:", tripCode);
-        p2pManager.initializeAsHost(tripCode).then((peerId) => {
-          // Αφού γίνει initialize, κάνει redirect
-          const joinUrl = `${window.location.origin}${window.location.pathname}?trip=${tripCode}&user=${encodeURIComponent(userName)}&tripname=${encodeURIComponent(tripName)}&host=${peerId}`;
-          window.location.href = joinUrl;
-        }).catch(() => {
-          // Fallback αν αποτύχει το P2P
-          const joinUrl = `${window.location.origin}${window.location.pathname}?trip=${tripCode}&user=${encodeURIComponent(userName)}&tripname=${encodeURIComponent(tripName)}`;
-          window.location.href = joinUrl;
-        });
-      } else {
-        // Fallback χωρίς P2P
-        const joinUrl = `${window.location.origin}${window.location.pathname}?trip=${tripCode}&user=${encodeURIComponent(userName)}&tripname=${encodeURIComponent(tripName)}`;
-        window.location.href = joinUrl;
-      }
+      // Ανακατεύθυνση με τον νέο κωδικό
+      const joinUrl = `${window.location.origin}${window.location.pathname}?trip=${tripCode}&user=${encodeURIComponent(userName)}&tripname=${encodeURIComponent(tripName)}`;
+      window.location.href = joinUrl;
     }
 
     // ΣΥΝΔΕΣΗ ΣΕ ΥΠΑΡΧΟΝ ΤΑΞΙΔΙ
@@ -1578,6 +1714,60 @@
       document.getElementById('settingsTripName').value = currentTrip.name;
       document.getElementById('settingsUserName').value = currentUser;
       updateSettingsMembersList();
+      
+      // P2P Status
+      updateP2PStatusDisplay();
+    }
+
+    // ΕΝΗΜΕΡΩΣΗ P2P STATUS
+    function updateP2PStatus(isConnected, message = "") {
+      const p2pStatusElement = document.getElementById('p2pStatus');
+      const liveSyncElement = document.getElementById('liveSyncStatus');
+      const p2pStatusText = document.getElementById('p2pStatusText');
+      const p2pConnectionsText = document.getElementById('p2pConnectionsText');
+      
+      if (p2pStatusElement) {
+        p2pStatusElement.style.display = 'flex';
+        if (isConnected) {
+          p2pStatusElement.className = 'p2p-status p2p-connected';
+          p2pStatusElement.innerHTML = `<i class="fas fa-circle"></i><span>P2P: Online</span>`;
+        } else {
+          p2pStatusElement.className = 'p2p-status p2p-disconnected';
+          p2pStatusElement.innerHTML = `<i class="fas fa-circle"></i><span>P2P: Offline</span>`;
+        }
+      }
+      
+      if (liveSyncElement) {
+        if (isConnected) {
+          liveSyncElement.className = 'p2p-status p2p-connected';
+          liveSyncElement.innerHTML = `<i class="fas fa-circle"></i><span>Live</span>`;
+        } else {
+          liveSyncElement.className = 'p2p-status p2p-disconnected';
+          liveSyncElement.innerHTML = `<i class="fas fa-circle"></i><span>Offline</span>`;
+        }
+      }
+      
+      if (p2pStatusText) {
+        p2pStatusText.textContent = message || (isConnected ? "Συνδεδεμένος" : "Αποσυνδεδεμένος");
+        p2pStatusText.style.color = isConnected ? "#10b981" : "#ef4444";
+      }
+      
+      if (p2pConnectionsText && window.p2pManager) {
+        p2pConnectionsText.textContent = window.p2pManager.connections.size;
+      }
+    }
+
+    function updateP2PStatusDisplay() {
+      if (window.p2pManager) {
+        const isConnected = p2pManager.isConnected && p2pManager.peerId;
+        const statusMessage = isConnected ? 
+          (p2pManager.isHost ? "Host" : "Guest") : 
+          "Αποσυνδεδεμένος";
+        
+        updateP2PStatus(isConnected, statusMessage);
+      } else {
+        updateP2PStatus(false, "P2P not loaded");
+      }
     }
 
     // ΣΥΝΑΡΤΗΣΕΙΣ ΓΙΑ ΤΗΝ ΚΑΡΤΕΛΑ "ΤΑΞΙΔΙΑ ΜΟΥ"
@@ -1680,6 +1870,11 @@
       updateUI();
       updateTotals();
       
+      // Επανασύνδεση P2P
+      setTimeout(() => {
+        initializeP2PConnection();
+      }, 1000);
+      
       // Αλλαγή στην καρτέλα καταχωρήσεων
       switchTab('tracker');
       
@@ -1725,11 +1920,11 @@
       console.log("📡 Δημιουργία QR με P2P...");
       
       // Έλεγχος αν το P2P είναι έτοιμο
-      if (window.p2pManager && p2pManager.isConnected && p2pManager.peerId) {
+      if (window.p2pManager && p2pManager.isConnected && p2pManager.peerId && p2pManager.isHost) {
         console.log("✅ P2P ενεργό, δημιουργία QR με peerId:", p2pManager.peerId);
         
         // Δεδομένα για P2P σύνδεση
-        const qrData = {
+        const shareData = {
           tripCode: currentTrip.code,
           peerId: p2pManager.peerId,
           tripName: currentTrip.name,
@@ -1738,7 +1933,7 @@
         };
         
         // Κωδικοποίηση σε Base64
-        const jsonString = JSON.stringify(qrData);
+        const jsonString = JSON.stringify(shareData);
         const encodedData = btoa(encodeURIComponent(jsonString));
         const shareUrl = `${window.location.origin}${window.location.pathname}?p2p=${encodedData}`;
         
@@ -1789,13 +1984,20 @@
     }
 
     function shareViaLink() {
-      const shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}`;
+      let shareUrl;
+      
+      if (window.p2pManager && p2pManager.isConnected && p2pManager.peerId && p2pManager.isHost) {
+        shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}&host=${p2pManager.peerId}`;
+      } else {
+        shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}`;
+      }
+      
       document.getElementById('shareLink').value = shareUrl;
       document.getElementById('qrContainer').style.display = 'none';
       document.getElementById('linkContainer').style.display = 'block';
     }
 
-    // ΚΑΤΑΧΩΡΗΣΗ ΕΞΟΔΩΝ
+    // ΚΑΤΑΧΩΡΗΣΗ ΕΞΟΔΩΝ ΜΕ REAL-TIME SYNC
     function addQuickExpense() {
       const category = document.getElementById('expenseCategory').value;
       const amount = parseFloat(document.getElementById('expenseAmount').value);
@@ -1808,17 +2010,20 @@
       }
       
       const date = new Date().toLocaleDateString('el-GR');
+      const timestamp = Date.now();
       
       const newExpense = {
-        id: Date.now() + Math.random(),
+        id: timestamp + Math.random().toString(36).substr(2, 9),
         category: category,
         amount: Number(amount),
         user: user,
         note: note,
         date: date,
-        created: new Date().toISOString()
+        created: new Date().toISOString(),
+        timestamp: timestamp
       };
       
+      // Προσθήκη στη λίστα
       expenses.push(newExpense);
       currentTrip.expenses = expenses;
       
@@ -1826,14 +2031,17 @@
       saveTripToStorage();
       updateTotals();
       
-      // ΑΠΟΣΤΟΛΗ ΜΕΣΩ P2P
-      if (window.p2pManager && p2pManager.isConnected && p2pManager.connections.size > 0) {
-        console.log("📤 Αποστολή έξοδου via P2P:", newExpense);
-        p2pManager.broadcastExpense(newExpense);
-        showToast(`Προστέθηκε έξοδο (real-time)`, 'success');
-      } else {
-        showToast(`Προστέθηκε έξοδο (offline)`, 'success');
-      }
+      // ΔΗΜΙΟΥΡΓΙΑ BROADCAST DATA
+      const broadcastData = {
+        type: 'NEW_EXPENSE',
+        expense: newExpense,
+        tripCode: currentTrip.code,
+        sender: currentUser,
+        timestamp: timestamp
+      };
+      
+      // ΠΡΟΣΠΑΘΕΙΑ ΑΠΟΣΤΟΛΗΣ ΜΕΣΩ P2P
+      attemptP2PBroadcast(broadcastData, newExpense);
       
       // Καθαρισμός
       document.getElementById('expenseAmount').value = '';
@@ -1869,21 +2077,24 @@
       
       // Όλες οι καταχωρήσεις
       document.getElementById('allExpenses').innerHTML = expenses.length > 0 
-        ? expenses.map((expense, i) => `
-            <div class='expense-item'>
-              <div class='expense-info'>
-                <div class='expense-label'>${expense.category} - ${expense.amount.toFixed(2)} €</div>
-                <div class='expense-meta'>
-                  <span><i class="far fa-calendar"></i> ${expense.date}</span>
-                  <span class="expense-user"><i class="fas fa-user"></i> ${expense.user} ${expense.user === currentUser ? '(Εσείς)' : ''}</span>
-                  ${expense.note ? `<span><i class="far fa-comment"></i> ${expense.note}</span>` : ''}
+        ? expenses.slice().reverse().map((expense, i) => {
+            const originalIndex = expenses.length - 1 - i;
+            return `
+              <div class='expense-item'>
+                <div class='expense-info'>
+                  <div class='expense-label'>${expense.category} - ${expense.amount.toFixed(2)} €</div>
+                  <div class='expense-meta'>
+                    <span><i class="far fa-calendar"></i> ${expense.date}</span>
+                    <span class="expense-user"><i class="fas fa-user"></i> ${expense.user} ${expense.user === currentUser ? '(Εσείς)' : ''}</span>
+                    ${expense.note ? `<span><i class="far fa-comment"></i> ${expense.note}</span>` : ''}
+                  </div>
+                </div>
+                <div class='expense-actions'>
+                  <button class='btn btn-danger btn-sm' onclick='deleteExpense(${originalIndex})'><i class="fas fa-trash"></i></button>
                 </div>
               </div>
-              <div class='expense-actions'>
-                <button class='btn btn-danger btn-sm' onclick='deleteExpense(${i})'><i class="fas fa-trash"></i></button>
-              </div>
-            </div>
-          `).reverse().join('')
+            `;
+          }).join('')
         : '<div class="empty-state"><i class="fas fa-receipt"></i><p>Δεν υπάρχουν καταχωρήσεις ακόμα</p></div>';
       
       // Σύνοψη ανά μέλος
@@ -1904,6 +2115,9 @@
           `).join('')
         : '<div class="empty-state"><i class="fas fa-user-friends"></i><p>Δεν υπάρχουν καταχωρήσεις ακόμα</p></div>';
       
+      // Κατηγορίες
+      document.getElementById('categoryCount').textContent = new Set(expenses.map(e => e.category)).size;
+      
       // Ενημέρωση chart
       updateChart();
     }
@@ -1920,12 +2134,171 @@
       updateTotals();
       
       // ΑΠΟΣΤΟΛΗ ΔΙΑΓΡΑΦΗΣ ΜΕΣΩ P2P
-      if (window.p2pManager && p2pManager.isConnected && p2pManager.connections.size > 0) {
-        console.log("🗑️ Αποστολή διαγραφής via P2P:", expense.id);
-        p2pManager.broadcastDelete(expense.id);
-      }
+      const deleteData = {
+        type: 'DELETE_EXPENSE',
+        expenseId: expense.id,
+        tripCode: currentTrip.code,
+        sender: currentUser,
+        timestamp: Date.now()
+      };
+      
+      attemptP2PBroadcast(deleteData);
       
       showToast(`Διαγράφηκε έξοδο ${expense.category}`, 'danger');
+    }
+
+    // ΑΠΟΣΤΟΛΗ ΜΕΣΩ P2P ΜΕ RETRY LOGIC
+    function attemptP2PBroadcast(data, originalExpense = null) {
+      if (!window.p2pManager || !p2pManager.isConnected) {
+        console.log("📴 P2P δεν είναι ενεργό, αποθήκευση για μετέπειτα");
+        
+        // Αποθήκευση σε pending broadcasts
+        if (!pendingBroadcasts) pendingBroadcasts = [];
+        pendingBroadcasts.push({ data, timestamp: Date.now() });
+        
+        if (originalExpense) {
+          showToast(`Προστέθηκε έξοδο (offline - θα συγχρονιστεί αργότερα)`, 'info');
+        }
+        
+        // Προσπάθεια επανασύνδεσης
+        setTimeout(initializeP2PConnection, 2000);
+        return;
+      }
+      
+      if (p2pManager.connections.size === 0) {
+        console.log("⚠️ Δεν υπάρχουν ενεργές συνδέσεις P2P");
+        
+        if (originalExpense) {
+          showToast(`Προστέθηκε έξοδο (offline - αναμονή συνδέσεων)`, 'info');
+        }
+        
+        // Αποθήκευση σε pending
+        if (!pendingBroadcasts) pendingBroadcasts = [];
+        pendingBroadcasts.push({ data, timestamp: Date.now() });
+        return;
+      }
+      
+      // Προσπάθεια αποστολής
+      try {
+        const success = p2pManager.broadcastReliably(data);
+        
+        if (success) {
+          console.log("✅ Επιτυχής broadcast");
+          if (originalExpense) {
+            showToast(`Προστέθηκε έξοδο (συγχρονίστηκε με ${p2pManager.connections.size} άτομα)`, 'success');
+          }
+        } else {
+          console.log("❌ Αποτυχία broadcast, αποθήκευση για retry");
+          if (!pendingBroadcasts) pendingBroadcasts = [];
+          pendingBroadcasts.push({ data, timestamp: Date.now() });
+          
+          if (originalExpense) {
+            showToast(`Προστέθηκε έξοδο (πρόβλημα συγχρονισμού)`, 'warning');
+          }
+        }
+      } catch (err) {
+        console.error("Σφάλμα broadcast:", err);
+        
+        if (!pendingBroadcasts) pendingBroadcasts = [];
+        pendingBroadcasts.push({ data, timestamp: Date.now() });
+        
+        if (originalExpense) {
+          showToast(`Προστέθηκε έξοδο (σφάλμα συγχρονισμού)`, 'warning');
+        }
+      }
+    }
+
+    // ΕΠΕΞΕΡΓΑΣΙΑ PENDING BROADCASTS
+    function processPendingBroadcasts() {
+      if (!pendingBroadcasts || pendingBroadcasts.length === 0) return;
+      
+      console.log(`🔄 Επεξεργασία ${pendingBroadcasts.length} εκκρεμών broadcasts...`);
+      
+      const now = Date.now();
+      const recentBroadcasts = pendingBroadcasts.filter(b => now - b.timestamp < 300000); // Μόνο τα τελευταία 5 λεπτά
+      
+      pendingBroadcasts = [];
+      
+      recentBroadcasts.forEach(broadcast => {
+        setTimeout(() => {
+          attemptP2PBroadcast(broadcast.data);
+        }, 100);
+      });
+      
+      if (recentBroadcasts.length > 0) {
+        showToast(`Συγχρονίζονται ${recentBroadcasts.length} εκκρεμείς ενέργειες`, 'info');
+      }
+    }
+
+    // ΕΛΕΓΧΟΣ P2P ΣΥΝΔΕΣΗΣ
+    function checkP2PConnection() {
+      if (!window.p2pManager) return;
+      
+      const wasConnected = p2pManager.isConnected;
+      const hasConnections = p2pManager.connections.size > 0;
+      
+      // Ενημέρωση status
+      updateP2PStatusDisplay();
+      
+      // Αν ήταν συνδεδεμένος και τώρα δεν είναι, προσπάθεια επανασύνδεσης
+      if (wasConnected && !p2pManager.isConnected) {
+        console.log("🔌 P2P connection lost, attempting reconnect...");
+        setTimeout(initializeP2PConnection, 3000);
+      }
+      
+      // Αν έχουμε pending broadcasts και τώρα έχουμε σύνδεση, προσπαθούμε να τα στείλουμε
+      if (pendingBroadcasts && pendingBroadcasts.length > 0 && p2pManager.isConnected && hasConnections) {
+        processPendingBroadcasts();
+      }
+    }
+
+    // FORCE SYNC FUNCTION
+    function forceSync() {
+      if (!window.p2pManager || !p2pManager.isConnected) {
+        showToast("P2P δεν είναι ενεργό. Επανασύνδεση...", 'warning');
+        initializeP2PConnection();
+        return;
+      }
+      
+      if (p2pManager.connections.size === 0) {
+        showToast("Δεν υπάρχουν συνδέσεις. Ελέγξτε το δίκτυο.", 'warning');
+        return;
+      }
+      
+      // Αποστολή full sync σε όλους
+      if (p2pManager.isHost && currentTrip) {
+        const syncData = {
+          type: 'FULL_SYNC',
+          trip: currentTrip,
+          timestamp: Date.now(),
+          force: true,
+          sender: currentUser
+        };
+        
+        p2pManager.broadcastReliably(syncData);
+        showToast(`Αποστολή συγχρονισμού σε ${p2pManager.connections.size} χρήστες`, 'info');
+      } else {
+        // Ζητάμε resync από τον host
+        const requestData = {
+          type: 'REQUEST_SYNC',
+          tripCode: currentTrip.code,
+          timestamp: Date.now(),
+          sender: currentUser
+        };
+        
+        p2pManager.broadcastReliably(requestData);
+        showToast("Ζητήθηκε επανασυγχρονισμός από τον host", 'info');
+      }
+    }
+
+    // RECONNECT P2P
+    function reconnectP2P() {
+      if (window.p2pManager) {
+        p2pManager.disconnect();
+      }
+      
+      showToast("Επανασύνδεση P2P...", 'info');
+      setTimeout(initializeP2PConnection, 1000);
     }
 
     // ΒΟΗΘΗΤΙΚΕΣ ΣΥΝΑΡΤΗΣΕΙΣ
@@ -2018,6 +2391,17 @@
       updateUI();
       updateMembersDropdown();
       
+      // Αποστολή ενημέρωσης μέσω P2P
+      const memberData = {
+        type: 'NEW_MEMBER',
+        member: newMember,
+        tripCode: currentTrip.code,
+        timestamp: Date.now(),
+        sender: currentUser
+      };
+      
+      attemptP2PBroadcast(memberData);
+      
       showToast(`Προστέθηκε το μέλος "${newMember}"`, 'success');
     }
     
@@ -2042,6 +2426,17 @@
       updateUI();
       updateMembersDropdown();
       updateTotals();
+      
+      // Αποστολή ενημέρωσης μέσω P2P
+      const memberData = {
+        type: 'REMOVE_MEMBER',
+        member: memberToRemove,
+        tripCode: currentTrip.code,
+        timestamp: Date.now(),
+        sender: currentUser
+      };
+      
+      attemptP2PBroadcast(memberData);
       
       showToast(`Αφαιρέθηκε το μέλος "${memberToRemove}"`, 'success');
     }
@@ -2084,6 +2479,16 @@
       localStorage.setItem('currentTripCode', currentTrip.code);
       localStorage.setItem('currentUserName', currentUser);
       
+      // Αποστολή ενημέρωσης μέσω P2P
+      const settingsData = {
+        type: 'TRIP_UPDATED',
+        trip: currentTrip,
+        timestamp: Date.now(),
+        sender: currentUser
+      };
+      
+      attemptP2PBroadcast(settingsData);
+      
       // Ενημέρωση UI
       updateUI();
       updateMembersDropdown();
@@ -2103,20 +2508,18 @@
         content.classList.remove('active');
       });
       
-      // 2. Ενεργοποίηση του κουμπιού (ΧΩΡΙΣ χρήση event.target)
-      const allTabBtns = document.querySelectorAll('.tab-btn');
-      for (let btn of allTabBtns) {
-        const btnText = btn.textContent || btn.innerText || '';
-        if (btnText.includes(
-          tabName === 'tracker' ? 'Καταχώρηση' :
-          tabName === 'summary' ? 'Σύνοψη' :
-          tabName === 'expenses' ? 'Καταχωρήσεις' :
-          tabName === 'trips' ? 'Ταξίδια' :
-          'Ρυθμίσεις'
-        )) {
-          btn.classList.add('active');
-          break;
-        }
+      // 2. Ενεργοποίηση του κουμπιού με βάση τη σειρά τους
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      const tabIndex = {
+        'tracker': 0,
+        'summary': 1,
+        'expenses': 2,
+        'trips': 3,
+        'settings': 4
+      };
+      
+      if (tabIndex[tabName] !== undefined) {
+        tabButtons[tabIndex[tabName]].classList.add('active');
       }
       
       // 3. Ενεργοποίηση του περιεχομένου
@@ -2194,14 +2597,7 @@
     }
     
     function showNewTripModal() {
-      if (confirm('Θέλετε να δημιουργήσετε νέο ταξίδι; Θα αποσυνδεθείτε από το τρέχον.')) {
-        // Καθαρισμός μόνο του τρέχοντος ταξιδιού
-        localStorage.removeItem('currentTripCode');
-        localStorage.removeItem('currentUserName');
-        
-        // Reload χωρίς URL parameters
-        window.location.href = window.location.pathname;
-      }
+      document.getElementById('newTripModal').style.display = 'flex';
     }
     
     function closeNewTripModal() {
@@ -2209,6 +2605,7 @@
     }
     
     function createBrandNewTrip() {
+      closeNewTripModal();
       if (confirm('Θέλετε να δημιουργήσετε νέο ταξίδι; Θα αποσυνδεθείτε από το τρέχον.')) {
         localStorage.clear();
         location.reload();
@@ -2216,21 +2613,21 @@
     }
     
     function switchToAnotherTrip() {
+      closeNewTripModal();
       if (confirm('Θέλετε να συνδεθείτε σε άλλο ταξίδι; Θα αποσυνδεθείτε από το τρέχον.')) {
         localStorage.removeItem('currentTripCode');
         localStorage.removeItem('currentUserName');
         showJoinScreen();
-        closeNewTripModal();
       }
     }
     
     function resetCurrentTrip() {
+      closeNewTripModal();
       if (confirm('Θέλετε να επαναφέρετε το τρέχον ταξίδι; Θα διαγραφούν ΟΛΕΣ οι καταχωρήσεις.')) {
         currentTrip.expenses = [];
         expenses = [];
         saveTripToStorage();
         updateTotals();
-        closeNewTripModal();
         showToast('Το ταξίδι επαναφέρθηκε', 'success');
       }
     }
@@ -2262,6 +2659,16 @@
       location.reload();
     }
     
+    function clearAllExpenses() {
+      if (confirm('Θέλετε να διαγράψετε ΟΛΕΣ τις καταχωρήσεις; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.')) {
+        currentTrip.expenses = [];
+        expenses = [];
+        saveTripToStorage();
+        updateTotals();
+        showToast('Όλες οι καταχωρήσεις διαγράφηκαν', 'success');
+      }
+    }
+    
     // Test P2P connection
     function testP2PConnection() {
       if (!window.p2pManager) {
@@ -2273,7 +2680,8 @@
       - Connected: ${p2pManager.isConnected ? '✅' : '❌'}
       - Peer ID: ${p2pManager.peerId || 'none'}
       - Is Host: ${p2pManager.isHost ? 'Yes' : 'No'}
-      - Active Connections: ${p2pManager.connections.size}`;
+      - Active Connections: ${p2pManager.connections.size}
+      - Pending Broadcasts: ${pendingBroadcasts ? pendingBroadcasts.length : 0}`;
       
       alert(message);
     }
@@ -2300,6 +2708,8 @@
           this.peerId = null;
           this.isHost = false;
           this.onUpdate = null;
+          this.reconnectAttempts = 0;
+          this.maxReconnectAttempts = 5;
           console.log("📡 P2P Manager Initialized");
       }
       
@@ -2307,8 +2717,13 @@
           try {
               console.log("👑 Αρχικοποίηση ως HOST για ταξίδι:", tripCode);
               
+              // Καθαρισμός προηγούμενων συνδέσεων
+              if (this.peer) {
+                  this.peer.destroy();
+              }
+              
               // Προσθήκη STUN servers για καλύτερη σύνδεση
-              this.peer = new Peer({
+              this.peer = new Peer(`host_${tripCode}_${Date.now()}`, {
                   debug: 2,
                   config: {
                       iceServers: [
@@ -2322,18 +2737,39 @@
               });
               
               this.isHost = true;
+              this.reconnectAttempts = 0;
               
               return new Promise((resolve, reject) => {
                   this.peer.on('open', (id) => {
                       console.log("✅ Host Peer ID:", id);
                       this.peerId = id;
                       this.isConnected = true;
+                      
+                      // Αποθήκευση του peerId στο ταξίδι
+                      if (window.currentTrip) {
+                          window.currentTrip.p2pHostId = id;
+                          window.saveTripToStorage();
+                      }
+                      
                       resolve(id);
                   });
                   
                   this.peer.on('error', (err) => {
                       console.error("Peer error:", err);
-                      reject(err);
+                      this.isConnected = false;
+                      
+                      // Προσπάθεια reconnect αν είναι host
+                      if (this.isHost && this.reconnectAttempts < this.maxReconnectAttempts) {
+                          this.reconnectAttempts++;
+                          console.log(`🔄 Προσπάθεια επανασύνδεσης ${this.reconnectAttempts}/${this.maxReconnectAttempts}...`);
+                          setTimeout(() => {
+                              this.initializeAsHost(tripCode)
+                                  .then(resolve)
+                                  .catch(reject);
+                          }, 3000);
+                      } else {
+                          reject(err);
+                      }
                   });
                   
                   // Λήψη συνδέσεων από άλλους
@@ -2346,8 +2782,15 @@
                           if (window.currentTrip) {
                               this.sendFullSync(conn);
                           }
-                      }, 1000);
+                      }, 500);
                   });
+                  
+                  // Timeout για την αρχικοποίηση
+                  setTimeout(() => {
+                      if (!this.isConnected) {
+                          reject(new Error("Timeout κατά την αρχικοποίηση του Host"));
+                      }
+                  }, 10000);
               });
               
           } catch (error) {
@@ -2361,8 +2804,13 @@
           try {
               console.log("👤 Σύνδεση ως GUEST στον host:", hostPeerId);
               
+              // Καθαρισμός προηγούμενων συνδέσεων
+              if (this.peer) {
+                  this.peer.destroy();
+              }
+              
               // Προσθήκη STUN servers
-              this.peer = new Peer({
+              this.peer = new Peer(`guest_${Date.now()}`, {
                   debug: 2,
                   config: {
                       iceServers: [
@@ -2374,6 +2822,7 @@
               });
               
               this.isHost = false;
+              this.reconnectAttempts = 0;
               
               return new Promise((resolve, reject) => {
                   this.peer.on('open', (id) => {
@@ -2382,7 +2831,8 @@
                       
                       // Σύνδεση με τον host
                       const conn = this.peer.connect(hostPeerId, {
-                          reliable: true
+                          reliable: true,
+                          serialization: 'json'
                       });
                       
                       this.setupConnection(conn);
@@ -2392,8 +2842,28 @@
                   
                   this.peer.on('error', (err) => {
                       console.error("Peer error:", err);
-                      reject(err);
+                      this.isConnected = false;
+                      
+                      // Προσπάθεια reconnect
+                      if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                          this.reconnectAttempts++;
+                          console.log(`🔄 Προσπάθεια επανασύνδεσης ${this.reconnectAttempts}/${this.maxReconnectAttempts}...`);
+                          setTimeout(() => {
+                              this.initializeAsGuest(hostPeerId)
+                                  .then(resolve)
+                                  .catch(reject);
+                          }, 3000);
+                      } else {
+                          reject(err);
+                      }
                   });
+                  
+                  // Timeout για την αρχικοποίηση
+                  setTimeout(() => {
+                      if (!this.isConnected) {
+                          reject(new Error("Timeout κατά την σύνδεση με τον Host"));
+                      }
+                  }, 10000);
               });
               
           } catch (error) {
@@ -2410,51 +2880,74 @@
               console.log("🔗 Σύνδεση ανοιχτή με:", peerId);
               this.connections.set(peerId, conn);
               
-              showToast(`Συνδεθήκατε με ${this.isHost ? 'guest' : 'host'}`, 'success');
+              // Ενημέρωση UI
+              if (window.updateP2PStatusDisplay) {
+                  window.updateP2PStatusDisplay();
+              }
+              
+              console.log("👥 Συνολικές συνδέσεις:", this.connections.size);
           });
           
           conn.on('data', (data) => {
-              console.log("📩 Λήψη δεδομένων από", peerId, ":", data);
-              this.handleIncomingData(data);
+              console.log("📩 Λήψη δεδομένων από", peerId, ":", data.type || data);
+              this.handleIncomingData(data, peerId);
           });
           
           conn.on('close', () => {
               console.log("🔒 Σύνδεση κλείστηκε με:", peerId);
               this.connections.delete(peerId);
-              showToast("Αποσυνδέθηκε ένα μέλος", 'warning');
+              
+              // Ενημέρωση UI
+              if (window.updateP2PStatusDisplay) {
+                  window.updateP2PStatusDisplay();
+              }
+              
+              if (window.showToast) {
+                  window.showToast("Αποσυνδέθηκε ένα μέλος", 'warning');
+              }
           });
           
           conn.on('error', (err) => {
               console.error("Σφάλμα σύνδεσης:", err);
+              this.connections.delete(peerId);
+              
+              if (window.updateP2PStatusDisplay) {
+                  window.updateP2PStatusDisplay();
+              }
           });
       }
       
       // Αποστολή νέου έξοδου σε όλους
       broadcastExpense(expense) {
-          if (this.connections.size === 0) return;
+          if (this.connections.size === 0) {
+              console.log("⚠️ Δεν υπάρχουν συνδέσεις για broadcast");
+              return false;
+          }
           
           const data = {
               type: 'NEW_EXPENSE',
               expense: expense,
-              tripCode: window.currentTrip.code,
-              timestamp: Date.now()
+              tripCode: window.currentTrip ? window.currentTrip.code : null,
+              timestamp: Date.now(),
+              sender: window.currentUser || 'Unknown'
           };
           
-          this.broadcast(data);
+          return this.broadcastReliably(data);
       }
       
       // Αποστολή διαγραφής σε όλους
       broadcastDelete(expenseId) {
-          if (this.connections.size === 0) return;
+          if (this.connections.size === 0) return false;
           
           const data = {
               type: 'DELETE_EXPENSE',
               expenseId: expenseId,
-              tripCode: window.currentTrip.code,
-              timestamp: Date.now()
+              tripCode: window.currentTrip ? window.currentTrip.code : null,
+              timestamp: Date.now(),
+              sender: window.currentUser || 'Unknown'
           };
           
-          this.broadcast(data);
+          return this.broadcastReliably(data);
       }
       
       // Αποστολή full sync (όλα τα δεδομένα)
@@ -2464,30 +2957,60 @@
           const data = {
               type: 'FULL_SYNC',
               trip: window.currentTrip,
-              timestamp: Date.now()
+              timestamp: Date.now(),
+              sender: window.currentUser || 'Unknown'
           };
           
-          conn.send(data);
-          console.log("📤 Αποστολή FULL SYNC");
+          try {
+              conn.send(data);
+              console.log("📤 Αποστολή FULL SYNC σε:", conn.peer);
+              return true;
+          } catch (err) {
+              console.error("Σφάλμα αποστολής FULL SYNC:", err);
+              return false;
+          }
       }
       
       // Broadcast σε όλες τις συνδέσεις
-      broadcast(data) {
+      broadcastReliably(data) {
+          if (this.connections.size === 0) {
+              console.log("⚠️ Δεν υπάρχουν ενεργές συνδέσεις για broadcast");
+              return false;
+          }
+          
+          let successCount = 0;
           this.connections.forEach((conn, peerId) => {
               try {
-                  conn.send(data);
-                  console.log("📤 Αποστολή σε:", peerId);
+                  // Έλεγχος αν η σύνδεση είναι ανοιχτή
+                  if (conn.open) {
+                      conn.send(data);
+                      successCount++;
+                      console.log("📤 Επιτυχής αποστολή σε:", peerId);
+                  } else {
+                      console.log("🔒 Σύνδεση κλειστή για:", peerId);
+                      this.connections.delete(peerId);
+                  }
               } catch (err) {
-                  console.error("Σφάλμα αποστολής σε", peerId, ":", err);
+                  console.error("❌ Σφάλμα αποστολής σε", peerId, ":", err);
+                  this.connections.delete(peerId);
               }
           });
+          
+          console.log(`📊 Αποτέλεσμα broadcast: ${successCount}/${this.connections.size} επιτυχείς`);
+          return successCount > 0;
       }
       
       // Χειρισμός εισερχόμενων δεδομένων
-      handleIncomingData(data) {
+      handleIncomingData(data, senderPeerId) {
           if (!data || !data.type) return;
           
           console.log("🔄 Επεξεργασία:", data.type);
+          
+          // Έλεγχος αν τα δεδομένα αφορούν το τρέχον ταξίδι
+          if (data.tripCode && window.currentTrip && data.tripCode !== window.currentTrip.code) {
+              console.log("⚠️ Το μήνυμα δεν αφορά το τρέχον ταξίδι");
+              return;
+          }
           
           switch(data.type) {
               case 'NEW_EXPENSE':
@@ -2501,14 +3024,32 @@
               case 'FULL_SYNC':
                   this.handleFullSync(data);
                   break;
+                  
+              case 'REQUEST_SYNC':
+                  this.handleRequestSync(data, senderPeerId);
+                  break;
+                  
+              case 'NEW_MEMBER':
+                  this.handleNewMember(data);
+                  break;
+                  
+              case 'REMOVE_MEMBER':
+                  this.handleRemoveMember(data);
+                  break;
+                  
+              case 'TRIP_UPDATED':
+                  this.handleTripUpdated(data);
+                  break;
           }
       }
       
       // Χειρισμός νέου έξοδου
       handleNewExpense(data) {
-          if (!window.currentTrip || window.currentTrip.code !== data.tripCode) return;
+          if (!window.currentTrip || (data.tripCode && data.tripCode !== window.currentTrip.code)) return;
           
           const newExpense = data.expense;
+          
+          // Έλεγχος αν υπάρχει ήδη
           const exists = window.expenses.find(e => e.id === newExpense.id);
           
           if (!exists) {
@@ -2518,18 +3059,33 @@
               window.updateTotals();
               
               // Ενημέρωση UI
-              showToast(`Νέα καταχώρηση από ${newExpense.user}`, 'info');
+              if (window.showToast && data.sender !== window.currentUser) {
+                  window.showToast(`Νέα καταχώρηση από ${newExpense.user}: ${newExpense.category}`, 'info');
+              }
               
-              // Αν υπάρχει callback, κλήση του
-              if (this.onUpdate) {
-                  this.onUpdate('NEW_EXPENSE', newExpense);
+              // Προώθηση σε άλλους (εκτός από τον sender)
+              if (this.isHost && data.sender !== window.currentUser) {
+                  const forwardData = {
+                      ...data,
+                      forwarded: true
+                  };
+                  
+                  this.connections.forEach((conn, peerId) => {
+                      if (peerId !== data.senderPeerId) {
+                          try {
+                              conn.send(forwardData);
+                          } catch (err) {
+                              console.error("Σφάλμα προώθησης:", err);
+                          }
+                      }
+                  });
               }
           }
       }
       
       // Χειρισμός διαγραφής
       handleDeleteExpense(data) {
-          if (!window.currentTrip || window.currentTrip.code !== data.tripCode) return;
+          if (!window.currentTrip || (data.tripCode && data.tripCode !== window.currentTrip.code)) return;
           
           const index = window.expenses.findIndex(e => e.id === data.expenseId);
           if (index !== -1) {
@@ -2538,9 +3094,22 @@
               window.saveTripToStorage();
               window.updateTotals();
               
-              // Αν υπάρχει callback, κλήση του
-              if (this.onUpdate) {
-                  this.onUpdate('DELETE_EXPENSE', data.expenseId);
+              // Προώθηση σε άλλους (εκτός από τον sender)
+              if (this.isHost && data.sender !== window.currentUser) {
+                  const forwardData = {
+                      ...data,
+                      forwarded: true
+                  };
+                  
+                  this.connections.forEach((conn, peerId) => {
+                      if (peerId !== data.senderPeerId) {
+                          try {
+                              conn.send(forwardData);
+                          } catch (err) {
+                              console.error("Σφάλμα προώθησης:", err);
+                          }
+                      }
+                  });
               }
           }
       }
@@ -2550,6 +3119,11 @@
           if (!data.trip || !data.trip.code) return;
           
           console.log("🔄 Λήψη FULL SYNC για ταξίδι:", data.trip.code);
+          
+          // Αποθήκευση του host peerId αν δεν το έχουμε
+          if (data.senderPeerId && !window.currentTrip.p2pHostId) {
+              window.currentTrip.p2pHostId = data.senderPeerId;
+          }
           
           // Ενημέρωση τοπικών δεδομένων
           window.currentTrip = data.trip;
@@ -2562,7 +3136,72 @@
           window.updateUI();
           window.updateTotals();
           
-          showToast("Συγχρονίστηκαν τα δεδομένα", 'success');
+          if (window.showToast) {
+              window.showToast("Συγχρονίστηκαν τα δεδομένα", 'success');
+          }
+      }
+      
+      // Χειρισμός αιτήματος sync
+      handleRequestSync(data, senderPeerId) {
+          if (!this.isHost) return;
+          
+          console.log("📥 Αίτημα sync από:", senderPeerId);
+          
+          // Αποστολή full sync στον συγκεκριμένο χρήστη
+          const conn = this.connections.get(senderPeerId);
+          if (conn) {
+              setTimeout(() => {
+                  this.sendFullSync(conn);
+              }, 500);
+          }
+      }
+      
+      // Χειρισμός νέου μέλους
+      handleNewMember(data) {
+          if (!window.currentTrip || (data.tripCode && data.tripCode !== window.currentTrip.code)) return;
+          
+          if (!window.currentTrip.members.includes(data.member)) {
+              window.currentTrip.members.push(data.member);
+              window.saveTripToStorage();
+              window.updateUI();
+              
+              if (window.showToast && data.sender !== window.currentUser) {
+                  window.showToast(`Νέο μέλος: ${data.member}`, 'info');
+              }
+          }
+      }
+      
+      // Χειρισμός αφαίρεσης μέλους
+      handleRemoveMember(data) {
+          if (!window.currentTrip || (data.tripCode && data.tripCode !== window.currentTrip.code)) return;
+          
+          window.currentTrip.members = window.currentTrip.members.filter(m => m !== data.member);
+          window.currentTrip.expenses = window.currentTrip.expenses.filter(e => e.user !== data.member);
+          window.expenses = window.currentTrip.expenses;
+          
+          window.saveTripToStorage();
+          window.updateUI();
+          window.updateTotals();
+          
+          if (window.showToast && data.sender !== window.currentUser) {
+              window.showToast(`Αφαιρέθηκε μέλος: ${data.member}`, 'info');
+          }
+      }
+      
+      // Χειρισμός ενημέρωσης ταξιδιού
+      handleTripUpdated(data) {
+          if (!window.currentTrip || (data.tripCode && data.tripCode !== window.currentTrip.code)) return;
+          
+          window.currentTrip = data.trip;
+          window.expenses = window.currentTrip.expenses || [];
+          
+          window.saveTripToStorage();
+          window.updateUI();
+          window.updateTotals();
+          
+          if (window.showToast && data.sender !== window.currentUser) {
+              window.showToast("Ενημερώθηκαν οι ρυθμίσεις ταξιδιού", 'info');
+          }
       }
       
       // Αποσύνδεση
@@ -2571,6 +3210,7 @@
               this.peer.destroy();
               this.connections.clear();
               this.isConnected = false;
+              this.peerId = null;
               console.log("🔌 Αποσυνδέθηκε το P2P");
           }
       }
@@ -2578,6 +3218,25 @@
   
   // Δημιουργία global instance
   window.p2pManager = new P2PManager();
+  
+  // Προσθήκη event listener για online/offline status
+  window.addEventListener('online', function() {
+      console.log("🌐 Συνδέθηκε στο δίκτυο");
+      if (window.currentTrip && window.currentUser) {
+          setTimeout(() => {
+              if (window.initializeP2PConnection) {
+                  window.initializeP2PConnection();
+              }
+          }, 2000);
+      }
+  });
+  
+  window.addEventListener('offline', function() {
+      console.log("📵 Αποσυνδέθηκε από το δίκτυο");
+      if (window.updateP2PStatus) {
+          window.updateP2PStatus(false, "Offline");
+      }
+  });
   </script>
 </body>
 </html>
