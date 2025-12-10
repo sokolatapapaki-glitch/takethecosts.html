@@ -1295,13 +1295,15 @@
       const tripCode = urlParams.get('trip');
       const userName = urlParams.get('user');
       
-      if (tripCode) {
-        // Προσπάθεια αυτόματης σύνδεσης
-        autoJoinTrip(tripCode, userName, Ταξίδι ${tripCode});.
-      } else {
-        // Έλεγχος για αποθηκευμένο ταξίδι
-        checkSavedTrip();
-      }
+     if (tripCode) {
+  // Προσπάθεια αυτόματης σύνδεσης
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripNameParam = urlParams.get('tripname');
+  autoJoinTrip(tripCode, userName, tripNameParam || `Ταξίδι ${tripCode}`);
+} else {
+  // Έλεγχος για αποθηκευμένο ταξίδι
+  checkSavedTrip();
+}
     });
 
     // ΑΥΤΟΜΑΤΗ ΣΥΝΔΕΣΗ
