@@ -1004,6 +1004,7 @@
         <button class="tab-btn active" onclick="switchTab('tracker')"><i class="fas fa-plus-circle"></i> Καταχώρηση</button>
         <button class="tab-btn" onclick="switchTab('summary')"><i class="fas fa-chart-pie"></i> Σύνοψη</button>
         <button class="tab-btn" onclick="switchTab('expenses')"><i class="fas fa-list"></i> Καταχωρήσεις</button>
+        <button class="tab-btn" onclick="switchTab('trips')"><i class="fas fa-suitcase"></i> Ταξίδια Μου</button>
         <button class="tab-btn" onclick="switchTab('settings')"><i class="fas fa-cog"></i> Ρυθμίσεις</button>
       </div>
 
@@ -1120,7 +1121,34 @@
           <div id="allExpenses"></div>
         </div>
       </div>
-
+<!-- Trips Tab -->
+<div id="trips" class="tab-content">
+  <div class="card">
+    <div class="card-title">
+      <i class="fas fa-suitcase"></i>
+      <h2>Τα Ταξίδια Μου</h2>
+    </div>
+    <div id="myTripsList" style="min-height: 300px;">
+      <!-- Εδώ θα εμφανίζονται τα ταξίδια -->
+      <div class="empty-state" id="tripsEmptyState">
+        <i class="fas fa-suitcase"></i>
+        <p>Δεν βρέθηκαν αποθηκευμένα ταξίδια</p>
+      </div>
+    </div>
+    
+    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+      <button class="btn btn-primary" onclick="showNewTripModal()" style="width: 100%;">
+        <i class="fas fa-plus-circle"></i> Νέο Ταξίδι
+      </button>
+      
+      <div style="margin-top: 15px; padding: 12px; background: #f8fafc; border-radius: 8px;">
+        <p style="font-size: 0.9rem; color: var(--gray); margin-bottom: 8px;">
+          <i class="fas fa-info-circle"></i> Για να επιστρέψετε σε ένα ταξίδι, πατήστε πάνω του.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
       <!-- Settings Tab -->
       <div id="settings" class="tab-content">
         <div class="card">
