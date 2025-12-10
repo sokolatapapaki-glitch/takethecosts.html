@@ -1622,7 +1622,7 @@ function deleteTrip(tripCode) {
 }
 
 // 4. Μόλις αλλάξεις καρτέλα, φόρτωσε τα ταξίδια
-function switchTab(tabName) {
+function switchTab(tabName, e) {
   console.log(`🔄 Αλλαγή σε καρτέλα: ${tabName}`);
   
   // 1. Απενεργοποίηση όλων των tabs
@@ -1634,10 +1634,11 @@ function switchTab(tabName) {
     content.classList.remove('active');
   });
   
-  // 2. Βρες το κουμπί που πατήθηκε και ενεργοποίησέ το
+  // 2. Ενεργοποίηση του κουμπιού (χωρίς event)
   const allTabBtns = document.querySelectorAll('.tab-btn');
   for (let btn of allTabBtns) {
-    if (btn.textContent.includes(
+    const btnText = btn.textContent || btn.innerText;
+    if (btnText.includes(
       tabName === 'tracker' ? 'Καταχώρηση' :
       tabName === 'summary' ? 'Σύνοψη' :
       tabName === 'expenses' ? 'Καταχωρήσεις' :
@@ -1664,7 +1665,6 @@ function switchTab(tabName) {
   
   console.log(`✅ Άλλαξε σε ${tabName}`);
 }
-
     // ΚΟΙΝΗ ΧΡΗΣΗ - QR CODE
     function generateQRCode() {
       if (!currentTrip) {
