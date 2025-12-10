@@ -1792,7 +1792,27 @@ function switchTab(tabName, e) {
             </div>
           `).reverse().join('')
         : '<div class="empty-state"><i class="fas fa-receipt"></i><p>Δεν υπάρχουν καταχωρήσεις ακόμα</p></div>';
-      
+      // ============================================
+// ΣΥΝΟΨΗ ΑΝΑ ΜΕΛΟΣ - ΠΡΟΣΘΕΤΗΘΗΚΕ ΤΩΡΑ
+// ============================================
+
+// Σύνοψη ανά μέλος
+const byUser = {};
+expenses.forEach(e => {
+  if (!byUser[e.user]) byUser[e.user] = 0;
+  byUser[e.user] += e.amount;
+});
+
+document.getElementById('userSummary').innerHTML = Object.entries(byUser).length > 0
+  ? Object.entries(byUser).map(([userName, total]) => `
+      <div class="expense-item" style="margin-bottom: 8px;">
+        <div class="expense-info">
+          <div class="expense-label">${userName} ${userName === currentUser ? '(Εσείς)' : ''}</div>
+        </div>
+        <div class="expense-amount">${total.toFixed(2)} €</div>
+      </div>
+    `).join('')
+  : '<div class="empty-state"><i class="fas fa-user-friends"></i><p>Δεν υπάρχουν καταχωρήσεις ακόμα</p></div>';
       // Ενημέρωση chart
       updateChart();
     }
