@@ -806,6 +806,50 @@
       margin-bottom: 12px;
       color: var(--primary);
     }
+    /* Trip Cards Styling */
+.trip-card {
+  transition: all 0.3s ease;
+}
+
+.trip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: #3b82f6 !important;
+}
+
+.trip-card h3 {
+  transition: color 0.3s ease;
+}
+
+.trip-card:hover h3 {
+  color: #3b82f6;
+}
+
+/* Καλύτερη εμφάνιση για την καρτέλα Ταξίδια */
+#myTripsList {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Scrollbar styling */
+#myTripsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+#myTripsList::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+#myTripsList::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+#myTripsList::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
   </style>
 </head>
 <body>
@@ -1424,6 +1468,164 @@
       document.getElementById('settingsUserName').value = currentUser;
       updateSettingsMembersList();
     }
+  // ============================================
+// ΣΥΝΑΡΤΗΣΕΙΣ ΓΙΑ ΤΗΝ ΚΑΡΤΕΛΑ "ΤΑΞΙΔΙΑ ΜΟΥ"
+// ============================================
+
+// 1. Φόρτωση λίστας ταξιδιών
+function loadMyTrips() {
+  const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
+  const tripsList = document.getElementById('myTripsList');
+  
+  if (!tripsList) return;
+  
+  const tripCodes = Object.keys(allTrips);
+  
+  if (tripCodes.length === 0) {
+    tripsList.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-suitcase"></i>
+        <p>Δεν βρέθηκαν αποθηκευμένα ταξίδια</p>
+        <button class="btn btn-primary" onclick="showNewTripModal()" style="margin-top: 15px;">
+          <i class="fas fa-plus-circle"></i> Δημιουργία Πρώτου Ταξιδιού
+        </button>
+      </div>
+    `;
+    return;
+  }
+  
+  // Ταξινόμηση από πιο πρόσφατο στο παλιότερο
+  const sortedTrips = tripCodes.map(code => allTrips[code])
+    .sort((a, b) => new Date(b.created) - new Date(a.created));
+  
+  let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
+  
+  sortedTrips.forEach(trip => {
+    const expenseCount = trip.expenses?.length || 0;
+    const totalAmount = trip.expenses?.reduce((sum, e) => sum + e.amount, 0) || 0;
+    const membersCount = trip.members?.length || 0;
+    const isCurrent = currentTrip && trip.code === currentTrip.code;
+    
+    html += `
+      <div class="trip-card" onclick="switchToTrip('${trip.code}')" 
+           style="padding: 16px; border: 2px solid ${isCurrent ? '#3b82f6' : '#e2e8f0'}; 
+                  border-radius: 12px; cursor: pointer; 
+                  background: ${isCurrent ? '#f0f9ff' : 'white'};
+                  transition: all 0.3s ease;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3 style="margin: 0; color: var(--dark);">
+              ${trip.name} ${isCurrent ? '<span style="color: #3b82f6;">(Τρέχον)</span>' : ''}
+            </h3>
+            <div style="display: flex; gap: 12px; margin-top: 8px; font-size: 0.9rem; color: var(--gray);">
+              <span><i class="fas fa-hashtag"></i> ${trip.code}</span>
+              <span><i class="fas fa-users"></i> ${membersCount} μέλη</span>
+              <span><i class="fas fa-receipt"></i> ${expenseCount} καταχωρήσεις</span>
+              <span><i class="fas fa-coins"></i> ${totalAmount.toFixed(2)} €</span>
+            </div>
+            <div style="margin-top: 8px; font-size: 0.85rem; color: var(--gray);">
+              <i class="far fa-calendar"></i> Δημιουργήθηκε: ${new Date(trip.created).toLocaleDateString('el-GR')}
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <button class="btn btn-sm ${isCurrent ? 'btn-primary' : 'btn-secondary'}" 
+                    onclick="event.stopPropagation(); switchToTrip('${trip.code}')">
+              <i class="fas fa-sign-in-alt"></i> ${isCurrent ? 'Ανοικτό' : 'Άνοιγμα'}
+            </button>
+            ${!isCurrent ? `
+              <button class="btn btn-sm btn-danger" 
+                      onclick="event.stopPropagation(); deleteTrip('${trip.code}')" 
+                      style="margin-top: 8px;">
+                <i class="fas fa-trash"></i> Διαγραφή
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  tripsList.innerHTML = html;
+}
+
+// 2. Επιστροφή σε ταξίδι
+function switchToTrip(tripCode) {
+  const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
+  
+  if (!allTrips[tripCode]) {
+    showToast('Το ταξίδι δεν βρέθηκε', 'danger');
+    return;
+  }
+  
+  // Επανάληψη της διαδικασίας σύνδεσης
+  currentTrip = allTrips[tripCode];
+  currentUser = localStorage.getItem('currentUserName') || 'Ταξιδιώτης';
+  expenses = currentTrip.expenses || [];
+  
+  // Αποθήκευση ως τρέχον
+  localStorage.setItem('currentTripCode', tripCode);
+  
+  // Ενημέρωση UI
+  updateUI();
+  updateTotals();
+  
+  // Αλλαγή στην καρτέλα καταχωρήσεων
+  switchTab('tracker');
+  
+  showToast(`Επιστρέψατε στο ταξίδι "${currentTrip.name}"`, 'success');
+}
+
+// 3. Διαγραφή ταξιδιού
+function deleteTrip(tripCode) {
+  if (!confirm('Θέλετε να διαγράψετε αυτό το ταξίδι; Όλες οι καταχωρήσεις θα χαθούν οριστικά.')) {
+    return;
+  }
+  
+  const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
+  
+  if (!allTrips[tripCode]) {
+    showToast('Το ταξίδι δεν βρέθηκε', 'danger');
+    return;
+  }
+  
+  // Μην διαγράψεις το τρέχον ταξίδι
+  if (currentTrip && currentTrip.code === tripCode) {
+    showToast('Δεν μπορείτε να διαγράψετε το τρέχον ταξίδι', 'warning');
+    return;
+  }
+  
+  // Διαγραφή
+  delete allTrips[tripCode];
+  localStorage.setItem('allTrips', JSON.stringify(allTrips));
+  
+  // Ενημέρωση λίστας
+  loadMyTrips();
+  
+  showToast('Το ταξίδι διαγράφηκε', 'success');
+}
+
+// 4. Μόλις αλλάξεις καρτέλα, φόρτωσε τα ταξίδια
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.remove('active');
+  });
+  
+  event.target.classList.add('active');
+  document.getElementById(tabName).classList.add('active');
+  
+  // ΕΑΝ ΕΙΝΑΙ Η ΚΑΡΤΕΛΑ ΤΑΞΙΔΙΑ, ΦΟΡΤΩΣΕ ΤΑ
+  if (tabName === 'trips') {
+    loadMyTrips();
+  }
+  
+  if (tabName === 'summary') {
+    setTimeout(updateChart, 100);
+  }
+}
 
     // ΚΟΙΝΗ ΧΡΗΣΗ - QR CODE
     function generateQRCode() {
