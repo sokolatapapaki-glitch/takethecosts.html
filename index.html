@@ -1354,6 +1354,18 @@ let categories = [
 
     // Σύνδεση σε ταξίδι
     function joinTrip(tripCode, userName) {
+  // ΒΗΜΑ 16: Αυτόματη προσθήκη ονόματος αν λείπει
+  if (!userName || userName.trim() === '') {
+    userName = prompt('Πώς σας λένε;', 'Φίλος');
+    if (!userName || userName.trim() === '') {
+      showToast('Χρειάζεται όνομα για σύνδεση', 'warning');
+      return;
+    }
+  }
+  
+  userName = userName.trim();
+  console.log('🔗 joinTrip called with:', tripCode, userName);
+  
   const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
   
   if (!allTrips[tripCode]) {
