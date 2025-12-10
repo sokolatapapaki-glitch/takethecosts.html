@@ -1297,7 +1297,7 @@
       
       if (tripCode) {
         // Προσπάθεια αυτόματης σύνδεσης
-        autoJoinTrip(tripCode, userName);
+        autoJoinTrip(tripCode, userName, Ταξίδι ${tripCode});.
       } else {
         // Έλεγχος για αποθηκευμένο ταξίδι
         checkSavedTrip();
@@ -1305,7 +1305,7 @@
     });
 
     // ΑΥΤΟΜΑΤΗ ΣΥΝΔΕΣΗ
-    function autoJoinTrip(tripCode, userName) {
+    function autoJoinTrip(tripCode, userName, tripName) {
       console.log("🔗 Αυτόματη σύνδεση με κωδικό:", tripCode);
       
       // Καθαρίζουμε προηγούμενα data (για να μην μπερδεύονται)
@@ -1325,13 +1325,13 @@
         }
         
         currentTrip = {
-          code: tripCode,
-          name: `Ταξίδι ${tripCode}`,
-          creator: userName,
-          created: new Date().toISOString(),
-          members: [userName],
-          expenses: []
-        };
+  code: tripCode,
+  name: tripName || `Ταξίδι ${tripCode}`, // <-- ΝΕΟ
+  creator: userName,
+  created: new Date().toISOString(),
+  members: [userName],
+  expenses: []
+};
         
         allTrips[tripCode] = currentTrip;
         localStorage.setItem('allTrips', JSON.stringify(allTrips));
@@ -1420,7 +1420,7 @@
       const tripCode = generateTripCode();
       
       // Ανακατεύθυνση με τον νέο κωδικό
-      const joinUrl = `${window.location.origin}${window.location.pathname}?trip=${tripCode}&user=${encodeURIComponent(userName)}`;
+      const joinUrl = `${window.location.origin}${window.location.pathname}?trip=${tripCode}&user=${encodeURIComponent(userName)}&tripname=${encodeURIComponent(tripName)}`;
       window.location.href = joinUrl;
     }
 
