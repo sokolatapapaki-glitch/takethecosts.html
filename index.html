@@ -1123,23 +1123,21 @@
     <h2>Προσθήκη Εξόδου</h2>
   </div>
   
-  <!-- ΑΠΛΟ ΚΑΙ ΕΥΚΟΛΟ FORM ΓΙΑ MOBILE -->
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-    <!-- ΠΟΣΟ ΚΑΙ ΚΟΥΜΠΙ ΔΙΠΛΑ ΔΙΠΛΑ -->
+    <!-- ΚΑΙΝΟΥΡΓΙΟ FORM ΓΙΑ MOBILE -->
+  <div style="display: flex; flex-direction: column; gap: 15px;">
+    
+    <!-- ΠΟΣΟ -->
     <div class="form-group">
       <label for="expenseAmount">Ποσό (€)</label>
-      <div style="display: flex; gap: 8px;">
-        <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00" style="flex: 1;">
-        <button class="btn btn-primary" onclick="addQuickExpense()" style="height: fit-content; white-space: nowrap;">
-          <i class="fas fa-plus"></i> Προσθήκη
-        </button>
-      </div>
+      <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00" 
+             style="width: 100%; font-size: 18px; padding: 15px; text-align: center;"
+             onfocus="this.select()">
     </div>
     
     <!-- ΚΑΤΗΓΟΡΙΑ -->
     <div class="form-group">
       <label for="expenseCategory">Κατηγορία</label>
-      <select id="expenseCategory">
+      <select id="expenseCategory" style="width: 100%; padding: 12px; font-size: 16px;">
         <option value="Πρωινό">Πρωινό 🥐</option>
         <option value="Μεσημεριανό">Μεσημεριανό 🍝</option>
         <option value="Βραδινό">Βραδινό 🍲</option>
@@ -1152,27 +1150,33 @@
         <option value="Κρουαζιέρα">Κρουαζιέρα 🚢</option>
       </select>
     </div>
-  </div>
-  
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+    
     <!-- ΠΟΙΟΣ ΠΛΗΡΩΣΕ -->
     <div class="form-group">
       <label for="expenseUser">Ποιος πλήρωσε;</label>
-      <select id="expenseUser"></select>
+      <select id="expenseUser" style="width: 100%; padding: 12px; font-size: 16px;"></select>
     </div>
     
     <!-- ΣΗΜΕΙΩΣΗ -->
     <div class="form-group">
       <label for="expenseNote">Σημείωση (προαιρετικά)</label>
-      <input id="expenseNote" type="text" placeholder="Π.χ. Καφές στο λιμάνι">
+      <input id="expenseNote" type="text" placeholder="Π.χ. Καφές στο λιμάνι" 
+             style="width: 100%; padding: 12px; font-size: 16px;">
     </div>
-  </div>
-  
-  <div style="margin-top: 15px; padding: 10px; background: #f0f9ff; border-radius: 8px; text-align: center;">
-    <p style="margin: 0; font-size: 0.85rem; color: #1e40af;">
-      <i class="fas fa-info-circle"></i> 
-      <strong>Γρήγορη προσθήκη:</strong> Βάλε ποσό → Πατα "Προσθήκη"!
-    </p>
+    
+    <!-- ΜΕΓΑΛΟ ΚΟΥΜΠΙ ΠΡΟΣΘΗΚΗΣ -->
+    <button class="btn btn-primary" onclick="addQuickExpense()" 
+            style="width: 100%; padding: 18px; font-size: 18px; font-weight: bold; margin-top: 10px; border-radius: 12px;">
+      <i class="fas fa-plus-circle"></i> ΠΡΟΣΘΗΚΗ ΕΞΟΔΟΥ
+    </button>
+    
+    <!-- ΟΔΗΓΙΕΣ -->
+    <div style="margin-top: 10px; padding: 12px; background: #f0f9ff; border-radius: 10px; text-align: center;">
+      <p style="margin: 0; font-size: 14px; color: #1e40af;">
+        <i class="fas fa-info-circle"></i> 
+        <strong>Γρήγορη προσθήκη:</strong> Συμπληρώστε τα πεδία → Πατήστε το πράσινο κουμπί!
+      </p>
+    </div>
   </div>
 </div>
       </div>
@@ -1376,31 +1380,43 @@
 
     // ΑΡΧΙΚΟΠΟΙΗΣΗ
     document.addEventListener('DOMContentLoaded', function() {
-      console.log("🚀 Εφαρμογή φορτώθηκε!");
-      
-      // Προσθέστε event listeners για τα tabs
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const tabName = this.getAttribute('data-tab');
-          switchTab(tabName);
-        });
-      });
-      
-      // Έλεγχος URL για κωδικό
-      const urlParams = new URLSearchParams(window.location.search);
-      const tripCode = urlParams.get('trip');
-      const userName = urlParams.get('user');
-      
-      if (tripCode) {
-        // Προσπάθεια αυτόματης σύνδεσης
-        const urlParams = new URLSearchParams(window.location.search);
-        const tripNameParam = urlParams.get('tripname');
-        autoJoinTrip(tripCode, userName, tripNameParam || `Ταξίδι ${tripCode}`);
-      } else {
-        // Έλεγχος για αποθηκευμένο ταξίδι
-        checkSavedTrip();
-      }
+  console.log("🚀 Εφαρμογή φορτώθηκε!");
+  
+  // Προσθέστε event listeners για τα tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const tabName = this.getAttribute('data-tab');
+      switchTab(tabName);
     });
+  });
+  
+  // Προσθήκη event listener για Enter στο ποσό
+  setTimeout(() => {
+    const amountInput = document.getElementById('expenseAmount');
+    if (amountInput) {
+      amountInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addQuickExpense();
+        }
+      });
+    }
+  }, 500);
+  
+  // Έλεγχος URL για κωδικό
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripCode = urlParams.get('trip');
+  const userName = urlParams.get('user');
+  
+  if (tripCode) {
+    // Προσπάθεια αυτόματης σύνδεσης
+    const tripNameParam = urlParams.get('tripname');
+    autoJoinTrip(tripCode, userName, tripNameParam || `Ταξίδι ${tripCode}`);
+  } else {
+    // Έλεγχος για αποθηκευμένο ταξίδι
+    checkSavedTrip();
+  }
+});
 
     // ΑΥΤΟΜΑΤΗ ΣΥΝΔΕΣΗ
     function autoJoinTrip(tripCode, userName, tripName) {
@@ -3157,6 +3173,69 @@ function copyShareLink() {
           window.updateP2PStatus(false, "Offline");
       }
   });
+// ΠΡΟΣΘΗΚΗ ΕΞΟΔΟΥ - ΓΙΑ MOBILE
+function addQuickExpense() {
+  // Πάρε τις τιμές από τα inputs
+  const amountInput = document.getElementById('expenseAmount');
+  const categoryInput = document.getElementById('expenseCategory');
+  const userInput = document.getElementById('expenseUser');
+  const noteInput = document.getElementById('expenseNote');
+  
+  const amount = parseFloat(amountInput.value);
+  const category = categoryInput.value;
+  const user = userInput.value;
+  const note = noteInput.value.trim();
+  
+  // Έλεγχος ορθότητας
+  if (!amount || amount <= 0) {
+    showToast('Εισάγετε έγκυρο ποσό', 'warning');
+    amountInput.focus();
+    return;
+  }
+  
+  if (!category) {
+    showToast('Επιλέξτε κατηγορία', 'warning');
+    return;
+  }
+  
+  if (!user) {
+    showToast('Επιλέξτε ποιος πλήρωσε', 'warning');
+    return;
+  }
+  
+  // Δημιουργία νέου έξοδου
+  const newExpense = {
+    id: Date.now() + Math.random(),
+    amount: amount,
+    category: category,
+    user: user,
+    note: note || '',
+    date: new Date().toLocaleDateString('el-GR'),
+    timestamp: Date.now()
+  };
+  
+  // Προσθήκη στη λίστα
+  expenses.push(newExpense);
+  currentTrip.expenses = expenses;
+  
+  // Αποθήκευση
+  saveTripToStorage();
+  
+  // Ενημέρωση UI
+  updateTotals();
+  
+  // Αποστολή μέσω P2P
+  if (window.p2pManager && p2pManager.isConnected) {
+    p2pManager.broadcastExpense(newExpense);
+  }
+  
+  // Καθαρισμός φόρμας
+  amountInput.value = '';
+  noteInput.value = '';
+  amountInput.focus(); // Επιστροφή στο ποσό
+  
+  showToast(`Προστέθηκε: ${category} - ${amount.toFixed(2)} €`, 'success');
+}
   </script>
 </body>
 </html>
