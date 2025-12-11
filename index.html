@@ -751,19 +751,22 @@
 
     // ==================== MAIN FUNCTIONS ====================
     function checkSavedTrip() {
-// ΚΑΘΑΡΙΣΜΟΣ ΜΟΝΟ ΓΙΑ ΤΗΝ ΟΜΑΔΑ
-  localStorage.removeItem('currentTrip');
-  localStorage.removeItem('currentUserName');
-  localStorage.removeItem('allTrips');
-  // ΠΑΝΤΑ ΕΜΦΑΝΙΣΗ SETUP SCREEN - ΚΑΘΑΡΗ ΑΡΧΗ ΓΙΑ ΟΛΟΥΣ
-  setupScreen.style.display = 'block';
-  appScreen.style.display = 'none';
+  // ΠΑΝΤΑ προσπάθησε να φορτώσεις τα ΑΠΟΘΗΚΕΥΜΕΝΑ δεδομένα
+  const savedTrip = localStorage.getItem('currentTrip');
+  const savedUserName = localStorage.getItem('currentUserName');
   
-  // ΚΑΘΑΡΙΣΜΟΣ ΟΠΟΙΩΝΔΗΠΟΤΕ ΠΡΟΗΓΟΥΜΕΝΩΝ
-  document.getElementById('setupTripName').value = '';
-  document.getElementById('setupUserName').value = '';
-  
-  // ΔΕΝ φορτώνουμε αυτόματα τίποτα - clean start
+  if (savedTrip && savedUserName) {
+    // ΒΡΕΘΗΚΑΝ ΔΕΔΟΜΕΝΑ - ΦΟΡΤΩΣΕ ΤΑ
+    currentTrip = JSON.parse(savedTrip);
+    currentUser = savedUserName;
+    expenses = currentTrip.expenses || [];
+    showApp();
+    updateUI();
+  } else {
+    // ΔΕΝ ΒΡΕΘΗΚΑΝ ΔΕΔΟΜΕΝΑ - ΕΜΦΑΝΙΣΗ SETUP
+    setupScreen.style.display = 'block';
+    appScreen.style.display = 'none';
+  }
 }
 
 function createNewTrip() {
