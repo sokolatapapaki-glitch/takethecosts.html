@@ -1058,15 +1058,42 @@
             </div>
           </div>
           
-          <div style="margin-top: 20px; padding: 16px; background: #f0f9ff; border-radius: var(--radius);">
-            <h3><i class="fas fa-info-circle"></i> Οδηγίες Σύνδεσης:</h3>
-            <p style="font-size: 0.9rem; margin-top: 8px;">
-              1. Ο δημιουργός πατάει "QR Code"<br>
-              2. Οι φίλοι σκανάρουν το QR με την κάμερά τους<br>
-              3. Η εφαρμογή ανοίγει αυτόματα και συνδέεται<br>
-              4. Όλοι βλέπουν τα ίδια έξοδα σε πραγματικό χρόνο!
-            </p>
-          </div>
+         <div style="margin-top: 20px; padding: 16px; background: #f0f9ff; border-radius: var(--radius);">
+  <h3><i class="fas fa-info-circle"></i> Οδηγίες Σύνδεσης:</h3>
+  
+  <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
+    <!-- QR Code Οδηγίες -->
+    <div style="background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+        <i class="fas fa-qrcode" style="color: #3b82f6;"></i>
+        <strong>QR Code:</strong>
+      </div>
+      <div style="font-size: 0.85rem; color: var(--gray);">
+        1. Πατήστε "QR Code"<br>
+        2. Οι φίλοι σκανάρουν με κάμερα<br>
+        3. Αυτόματη σύνδεση με real-time sync
+      </div>
+    </div>
+    
+    <!-- Link Οδηγίες -->
+    <div style="background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #10b981;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+        <i class="fas fa-link" style="color: #10b981;"></i>
+        <strong>Σύνδεσμος:</strong>
+      </div>
+      <div style="font-size: 0.85rem; color: var(--gray);">
+        1. Πατήστε "Σύνδεσμος"<br>
+        2. Αντιγράψτε και στείλτε το link<br>
+        3. Οι φίλοι ανοίγουν το link<br>
+        4. Αυτόματη σύνδεση με real-time sync
+      </div>
+    </div>
+  </div>
+  
+  <div style="margin-top: 12px; padding: 8px; background: #dbeafe; border-radius: 6px; text-align: center;">
+    <strong style="color: #1e40af;">✨ Και οι δύο μέθοδοι δουλεύουν με real-time sync! ✨</strong>
+  </div>
+</div>
         </div>
       </div>
 
@@ -1911,69 +1938,51 @@
     }
 
     // ΚΟΙΝΗ ΧΡΗΣΗ - QR CODE
-    function generateQRCode() {
-      if (!currentTrip) {
-        showToast('Δεν υπάρχει ενεργό ταξίδι', 'warning');
-        return;
-      }
-      
-      console.log("📡 Δημιουργία QR με P2P...");
-      
-      // Έλεγχος αν το P2P είναι έτοιμο
-      if (window.p2pManager && p2pManager.isConnected && p2pManager.peerId && p2pManager.isHost) {
-        console.log("✅ P2P ενεργό, δημιουργία QR με peerId:", p2pManager.peerId);
-        
-        // Δεδομένα για P2P σύνδεση
-        const shareData = {
-          tripCode: currentTrip.code,
-          peerId: p2pManager.peerId,
-          tripName: currentTrip.name,
-          timestamp: Date.now(),
-          type: 'travel_p2p_connect'
-        };
-        
-        // Κωδικοποίηση σε Base64
-        const jsonString = JSON.stringify(shareData);
-        const encodedData = btoa(encodeURIComponent(jsonString));
-        const shareUrl = `${window.location.origin}${window.location.pathname}?p2p=${encodedData}`;
-        
-        // Δημιουργία QR
-        document.getElementById('qrcode').innerHTML = '';
-        QRCode.toCanvas(document.getElementById('qrcode'), shareUrl, {
-          width: 220,
-          height: 220,
-          margin: 2,
-          color: {
-            dark: '#1e293b',
-            light: '#ffffff'
-          }
-        }, function(error) {
-          if (error) {
-            console.error(error);
-            showToast('Σφάλμα δημιουργίας QR', 'danger');
-          } else {
-            showToast('✅ QR με Real-time P2P!', 'success');
-          }
-        });
-        
-        document.getElementById('shareLink').value = shareUrl;
-        
-      } else {
-        // Fallback: παλιό QR χωρίς P2P
-        console.log("📴 P2P όχι έτοιμο, offline QR");
-        const shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}&user=${encodeURIComponent(currentUser)}`;
-        
-        document.getElementById('qrcode').innerHTML = '';
-        QRCode.toCanvas(document.getElementById('qrcode'), shareUrl, {
-          width: 200,
-          margin: 2
-        });
-        
-        document.getElementById('shareLink').value = shareUrl;
-        showToast('QR χωρίς real-time', 'info');
-      }
+   function generateQRCode() {
+  if (!currentTrip) {
+    showToast('Δεν υπάρχει ενεργό ταξίδι', 'warning');
+    return;
+  }
+  
+  console.log("📡 Δημιουργία QR με P2P...");
+  
+  // ΧΡΗΣΙΜΟΠΟΙΟΥΜΕ ΤΗΝ ΙΔΙΑ ΛΟΓΙΚΗ ΜΕ ΤΟ LINK!
+  let shareUrl;
+  
+  if (window.p2pManager && p2pManager.isConnected && p2pManager.peerId && p2pManager.isHost) {
+    console.log("✅ P2P ενεργό, δημιουργία QR με peerId:", p2pManager.peerId);
+    
+    // ΙΔΙΟ URL ΜΕ ΤΟ LINK!
+    shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}&host=${p2pManager.peerId}&tripname=${encodeURIComponent(currentTrip.name)}`;
+    showToast('✅ QR με Real-time P2P!', 'success');
+    
+  } else {
+    // Fallback: παλιό QR χωρίς P2P
+    console.log("📴 P2P όχι έτοιμο, offline QR");
+    shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}`;
+    showToast('QR χωρίς real-time', 'info');
+  }
+  
+  // Δημιουργία QR με το νέο URL
+  document.getElementById('qrcode').innerHTML = '';
+  QRCode.toCanvas(document.getElementById('qrcode'), shareUrl, {
+    width: 220,
+    height: 220,
+    margin: 2,
+    color: {
+      dark: '#1e293b',
+      light: '#ffffff'
     }
-
+  }, function(error) {
+    if (error) {
+      console.error(error);
+      showToast('Σφάλμα δημιουργίας QR', 'danger');
+    }
+  });
+  
+  // ΒΑΖΟΥΜΕ ΤΟ ΙΔΙΟ URL ΚΑΙ ΣΤΟ LINK FIELD
+  document.getElementById('shareLink').value = shareUrl;
+}
     function shareViaQR() {
       document.getElementById('qrContainer').style.display = 'flex';
       document.getElementById('linkContainer').style.display = 'none';
@@ -1984,19 +1993,21 @@
     }
 
     function shareViaLink() {
-      let shareUrl;
-      
-      if (window.p2pManager && p2pManager.isConnected && p2pManager.peerId && p2pManager.isHost) {
-        shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}&host=${p2pManager.peerId}`;
-      } else {
-        shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}`;
-      }
-      
-      document.getElementById('shareLink').value = shareUrl;
-      document.getElementById('qrContainer').style.display = 'none';
-      document.getElementById('linkContainer').style.display = 'block';
-    }
-
+  let shareUrl;
+  
+  if (window.p2pManager && p2pManager.isConnected && p2pManager.peerId && p2pManager.isHost) {
+    // ΙΔΙΟ URL ΜΕ ΤΟ QR!
+    shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}&host=${p2pManager.peerId}&tripname=${encodeURIComponent(currentTrip.name)}`;
+    showToast('✅ Λινκ με Real-time P2P!', 'success');
+  } else {
+    shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}`;
+    showToast('Λινκ χωρίς real-time sync', 'info');
+  }
+  
+  document.getElementById('shareLink').value = shareUrl;
+  document.getElementById('qrContainer').style.display = 'none';
+  document.getElementById('linkContainer').style.display = 'block';
+}
     // ΚΑΤΑΧΩΡΗΣΗ ΕΞΟΔΩΝ ΜΕ REAL-TIME SYNC
     function addQuickExpense() {
       const category = document.getElementById('expenseCategory').value;
