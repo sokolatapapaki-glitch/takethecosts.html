@@ -1090,10 +1090,16 @@ updateCategorySummary();  // <-- ΠΡΟΣΘΗΚΗ!
                   <span><i class="far fa-calendar"></i> ${new Date(trip.created).toLocaleDateString('el-GR')}</span>
                 </div>
               </div>
-              <button class="btn btn-sm ${isCurrent ? 'btn-primary' : 'btn-secondary'}" 
-                      onclick="event.stopPropagation(); switchToTrip('${trip.code}')">
-                <i class="fas fa-sign-in-alt"></i> ${isCurrent ? 'Ανοικτό' : 'Άνοιγμα'}
-              </button>
+              <div style="display: flex; gap: 5px;">
+  <button class="btn btn-sm ${isCurrent ? 'btn-primary' : 'btn-secondary'}" 
+          onclick="event.stopPropagation(); switchToTrip('${trip.code}')">
+    <i class="fas fa-sign-in-alt"></i> ${isCurrent ? 'Ανοικτό' : 'Άνοιγμα'}
+  </button>
+  <button class="btn btn-sm btn-danger" 
+          onclick="event.stopPropagation(); deleteTrip('${trip.code}')">
+    <i class="fas fa-trash"></i>
+  </button>
+</div>
             </div>
           </div>
         `;
@@ -1199,6 +1205,25 @@ function updateCategorySummary() {
   
   html += '</div>';
   container.innerHTML = html;
+}
+function deleteTrip(tripCode) {
+  if (!confirm('Θέλετε να διαγράψετε ΟΛΟΚΛΗΡΟ το ταξίδι; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.')) {
+    return;
+  }
+  
+  const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
+  delete allTrips[tripCode];
+  localStorage.setItem('allTrips', JSON.stringify(allTrips));
+  
+  // Αν είναι το τρέχον ταξίδι, επαναφορά
+  if (currentTrip && currentTrip.code === tripCode) {
+    localStorage.removeItem('currentTrip');
+    setupScreen.style.display = 'block';
+    appScreen.style.display = 'none';
+  }
+  
+  loadMyTrips();
+  showToast('Το ταξίδι διαγράφηκε', 'success');
 }
   </script>
 </body>
