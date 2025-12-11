@@ -1024,57 +1024,37 @@
             </p>
           </div>
           
-          <div class="share-options">
-            <div class="share-option" onclick="shareViaQR()">
-              <i class="fas fa-qrcode"></i>
-              <h3>QR Code</h3>
-              <p>Σκανάρετε με κάμερα</p>
-            </div>
-            
-            <div class="share-option" onclick="shareViaLink()">
-              <i class="fas fa-link"></i>
-              <h3>Σύνδεσμος</h3>
-              <p>Αποστολή με μήνυμα</p>
-            </div>
-          </div>
-          
-          <div id="qrContainer" class="qr-container" style="display: none;">
-            <div id="qrcode"></div>
-            <div id="qrLoading" style="display: none; text-align: center; padding: 20px; color: #3b82f6;">
-              <i class="fas fa-spinner fa-spin fa-2x"></i>
-              <p style="margin-top: 10px;">Δημιουργία QR Code...</p>
-            </div>
-          </div>
-          
-          <div id="linkContainer" style="display: none; margin-top: 20px;">
-            <div class="form-group">
-              <label>Σύνδεσμος Κοινής Χρήσης</label>
-              <div style="display: flex; gap: 8px;">
-                <input id="shareLink" type="text" readonly style="flex: 1;">
-                <button class="btn btn-secondary" onclick="copyShareLink()">
-                  <i class="fas fa-copy"></i>
-                </button>
-              </div>
-            </div>
-          </div>
+         <!-- ΑΠΛΟ ΜΕΝΟΥ ΜΕ ΜΟΝΟ LINK -->
+<div style="margin-top: 20px; padding: 20px; background: #f8fafc; border-radius: var(--radius);">
+  <h3 style="margin-bottom: 15px; color: var(--primary);">
+    <i class="fas fa-link"></i> Σύνδεσμος Κοινής Χρήσης
+  </h3>
+  
+  <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+    <input id="shareLink" type="text" readonly style="flex: 1; padding: 12px; font-size: 0.9rem;">
+    <button class="btn btn-primary" onclick="copyShareLink()">
+      <i class="fas fa-copy"></i> Αντιγραφή
+    </button>
+  </div>
+  
+  <p style="font-size: 0.9rem; color: var(--gray);">
+    Απλά αντιγράψτε και στείλτε αυτόν τον σύνδεσμο. Όποιος τον ανοίξει θα συνδεθεί αυτόματα!
+  </p>
+</div>
+
+<div style="margin-top: 15px; padding: 12px; background: #f0f9ff; border-radius: 8px;">
+  <p style="margin: 0; font-size: 0.9rem; color: #1e40af;">
+    <i class="fas fa-info-circle"></i> 
+    <strong>Πώς λειτουργεί:</strong> Στείλτε το link → Ανοίγουν το link → Συνδέονται αυτόματα!
+  </p>
+</div>
           
          <div style="margin-top: 20px; padding: 16px; background: #f0f9ff; border-radius: var(--radius);">
   <h3><i class="fas fa-info-circle"></i> Οδηγίες Σύνδεσης:</h3>
   
   <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
     <!-- QR Code Οδηγίες -->
-    <div style="background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #3b82f6;">
-      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-        <i class="fas fa-qrcode" style="color: #3b82f6;"></i>
-        <strong>QR Code:</strong>
-      </div>
-      <div style="font-size: 0.85rem; color: var(--gray);">
-        1. Πατήστε "QR Code"<br>
-        2. Οι φίλοι σκανάρουν με κάμερα<br>
-        3. Αυτόματη σύνδεση με real-time sync
-      </div>
-    </div>
-    
+        
     <!-- Link Οδηγίες -->
     <div style="background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #10b981;">
       <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
@@ -1136,55 +1116,65 @@
           <div class="categories-grid" id="category-buttons"></div>
         </div>
 
-        <!-- Custom Expense -->
-        <div class="card">
-          <div class="card-title">
-            <i class="fas fa-lightbulb"></i>
-            <h2>Προσθήκη Εξόδου</h2>
-          </div>
-          <div class="custom-expense">
-            <div class="form-group" style="flex: 1;">
-              <label for="expenseCategory">Κατηγορία</label>
-              <select id="expenseCategory">
-                <option value="Πρωινό">Πρωινό 🥐</option>
-                <option value="Μεσημεριανό">Μεσημεριανό 🍝</option>
-                <option value="Βραδινό">Βραδινό 🍲</option>
-                <option value="Σνακ">Σνακ 🍦</option>
-                <option value="Δώρα">Δώρα 🎁</option>
-                <option value="Μέσα Μεταφοράς">Μέσα Μεταφοράς 🚌</option>
-                <option value="Αεροπορικά">Αεροπορικά ✈️</option>
-                <option value="Ενοικίαση Αυτοκινήτου">Ενοικίαση Αυτοκινήτου 🚗</option>
-                <option value="Ταξί">Ταξί 🚕</option>
-                <option value="Κρουαζιέρα">Κρουαζιέρα 🚢</option>
-                <option value="Αξιοθέατο">Αξιοθέατο 🏛️</option>
-                <option value="Μουσείο">Μουσείο 🏛️</option>
-                <option value="Ξενοδοχείο">Ξενοδοχείο 🏨</option>
-                <option value="Airbnb">Airbnb 🏠</option>
-                <option value="Ασφάλεια Ταξιδιού">Ασφάλεια Ταξιδιού 🛡️</option>
-                <option value="Έκτακτο">Έκτακτο 💡</option>
-              </select>
-            </div>
-            
-            <div class="form-group" style="flex: 1;">
-              <label for="expenseAmount">Ποσό (€)</label>
-              <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00">
-            </div>
-            
-            <div class="form-group" style="flex: 1;">
-              <label for="expenseUser">Ποιος πλήρωσε;</label>
-              <select id="expenseUser"></select>
-            </div>
-            
-            <div class="form-group" style="flex: 2;">
-              <label for="expenseNote">Σημείωση (προαιρετικά)</label>
-              <input id="expenseNote" type="text" placeholder="Π.χ. Καφές στο λιμάνι">
-            </div>
-            
-            <button class="btn btn-primary" onclick="addQuickExpense()" style="height: fit-content;">
-              <i class="fas fa-plus"></i> Προσθήκη
-            </button>
-          </div>
-        </div>
+        <!-- Custom Expense - ΕΥΚΟΛΗ ΠΡΟΣΘΗΚΗ -->
+<div class="card">
+  <div class="card-title">
+    <i class="fas fa-lightbulb"></i>
+    <h2>Προσθήκη Εξόδου</h2>
+  </div>
+  
+  <!-- ΑΠΛΟ ΚΑΙ ΕΥΚΟΛΟ FORM ΓΙΑ MOBILE -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+    <!-- ΠΟΣΟ ΚΑΙ ΚΟΥΜΠΙ ΔΙΠΛΑ ΔΙΠΛΑ -->
+    <div class="form-group">
+      <label for="expenseAmount">Ποσό (€)</label>
+      <div style="display: flex; gap: 8px;">
+        <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00" style="flex: 1;">
+        <button class="btn btn-primary" onclick="addQuickExpense()" style="height: fit-content; white-space: nowrap;">
+          <i class="fas fa-plus"></i> Προσθήκη
+        </button>
+      </div>
+    </div>
+    
+    <!-- ΚΑΤΗΓΟΡΙΑ -->
+    <div class="form-group">
+      <label for="expenseCategory">Κατηγορία</label>
+      <select id="expenseCategory">
+        <option value="Πρωινό">Πρωινό 🥐</option>
+        <option value="Μεσημεριανό">Μεσημεριανό 🍝</option>
+        <option value="Βραδινό">Βραδινό 🍲</option>
+        <option value="Σνακ">Σνακ 🍦</option>
+        <option value="Δώρα">Δώρα 🎁</option>
+        <option value="Μέσα Μεταφοράς">Μέσα Μεταφοράς 🚌</option>
+        <option value="Αεροπορικά">Αεροπορικά ✈️</option>
+        <option value="Ενοικίαση Αυτοκινήτου">Ενοικίαση Αυτοκινήτου 🚗</option>
+        <option value="Ταξί">Ταξί 🚕</option>
+        <option value="Κρουαζιέρα">Κρουαζιέρα 🚢</option>
+      </select>
+    </div>
+  </div>
+  
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+    <!-- ΠΟΙΟΣ ΠΛΗΡΩΣΕ -->
+    <div class="form-group">
+      <label for="expenseUser">Ποιος πλήρωσε;</label>
+      <select id="expenseUser"></select>
+    </div>
+    
+    <!-- ΣΗΜΕΙΩΣΗ -->
+    <div class="form-group">
+      <label for="expenseNote">Σημείωση (προαιρετικά)</label>
+      <input id="expenseNote" type="text" placeholder="Π.χ. Καφές στο λιμάνι">
+    </div>
+  </div>
+  
+  <div style="margin-top: 15px; padding: 10px; background: #f0f9ff; border-radius: 8px; text-align: center;">
+    <p style="margin: 0; font-size: 0.85rem; color: #1e40af;">
+      <i class="fas fa-info-circle"></i> 
+      <strong>Γρήγορη προσθήκη:</strong> Βάλε ποσό → Πατα "Προσθήκη"!
+    </p>
+  </div>
+</div>
       </div>
 
       <!-- Summary Tab -->
@@ -1938,128 +1928,47 @@
     }
 
     // ΚΟΙΝΗ ΧΡΗΣΗ - QR CODE
-   function generateQRCode() {
+   
+    
+   function shareViaLink() {
   if (!currentTrip) {
     showToast('Δεν υπάρχει ενεργό ταξίδι', 'warning');
     return;
   }
   
-  console.log("📡 Δημιουργία QR με P2P...");
+  // Απλό URL με μόνο τον κωδικό ταξιδιού
+  const shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}`;
   
-  // ΧΡΗΣΙΜΟΠΟΙΟΥΜΕ ΤΗΝ ΙΔΙΑ ΛΟΓΙΚΗ ΜΕ ΤΟ LINK!
-  let shareUrl;
+  console.log("🔗 Δημιουργία link:", shareUrl);
   
-  if (window.p2pManager && p2pManager.isConnected && p2pManager.peerId && p2pManager.isHost) {
-    console.log("✅ P2P ενεργό, δημιουργία QR με peerId:", p2pManager.peerId);
-    
-    // ΙΔΙΟ URL ΜΕ ΤΟ LINK!
-    shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}&host=${p2pManager.peerId}&tripname=${encodeURIComponent(currentTrip.name)}`;
-    showToast('✅ QR με Real-time P2P!', 'success');
-    
+  // Βάζουμε το URL στο πεδίο
+  const shareLinkInput = document.getElementById('shareLink');
+  if (shareLinkInput) {
+    shareLinkInput.value = shareUrl;
+    console.log("✅ Τοποθετήθηκε στο input");
   } else {
-    // Fallback: παλιό QR χωρίς P2P
-    console.log("📴 P2P όχι έτοιμο, offline QR");
-    shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}`;
-    showToast('QR χωρίς real-time', 'info');
+    console.error("❌ Δεν βρέθηκε το input #shareLink");
   }
   
-  // Δημιουργία QR με το νέο URL
-  document.getElementById('qrcode').innerHTML = '';
-  QRCode.toCanvas(document.getElementById('qrcode'), shareUrl, {
-    width: 220,
-    height: 220,
-    margin: 2,
-    color: {
-      dark: '#1e293b',
-      light: '#ffffff'
-    }
-  }, function(error) {
-    if (error) {
-      console.error(error);
-      showToast('Σφάλμα δημιουργίας QR', 'danger');
-    }
-  });
-  
-  // ΒΑΖΟΥΜΕ ΤΟ ΙΔΙΟ URL ΚΑΙ ΣΤΟ LINK FIELD
-  document.getElementById('shareLink').value = shareUrl;
+  // Αυτόματη αντιγραφή
+  copyShareLink();
 }
-    function shareViaQR() {
-      document.getElementById('qrContainer').style.display = 'flex';
-      document.getElementById('linkContainer').style.display = 'none';
-      
-      setTimeout(() => {
-        generateQRCode();
-      }, 100);
-    }
 
-    function shareViaLink() {
-  let shareUrl;
-  
-  if (window.p2pManager && p2pManager.isConnected && p2pManager.peerId && p2pManager.isHost) {
-    // ΙΔΙΟ URL ΜΕ ΤΟ QR!
-    shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}&host=${p2pManager.peerId}&tripname=${encodeURIComponent(currentTrip.name)}`;
-    showToast('✅ Λινκ με Real-time P2P!', 'success');
-  } else {
-    shareUrl = `${window.location.origin}${window.location.pathname}?trip=${currentTrip.code}`;
-    showToast('Λινκ χωρίς real-time sync', 'info');
+function copyShareLink() {
+  const shareLinkInput = document.getElementById('shareLink');
+  if (!shareLinkInput || !shareLinkInput.value) {
+    showToast('Δεν υπάρχει σύνδεσμος για αντιγραφή', 'warning');
+    return;
   }
   
-  document.getElementById('shareLink').value = shareUrl;
-  document.getElementById('qrContainer').style.display = 'none';
-  document.getElementById('linkContainer').style.display = 'block';
+  const shareLink = shareLinkInput.value;
+  navigator.clipboard.writeText(shareLink)
+    .then(() => showToast('Ο σύνδεσμος αντιγράφηκε!', 'success'))
+    .catch((err) => {
+      console.error("Σφάλμα αντιγραφής:", err);
+      showToast('Αποτυχία αντιγραφής', 'danger');
+    });
 }
-    // ΚΑΤΑΧΩΡΗΣΗ ΕΞΟΔΩΝ ΜΕ REAL-TIME SYNC
-    function addQuickExpense() {
-      const category = document.getElementById('expenseCategory').value;
-      const amount = parseFloat(document.getElementById('expenseAmount').value);
-      const user = document.getElementById('expenseUser').value;
-      const note = document.getElementById('expenseNote').value.trim();
-      
-      if (!amount || amount <= 0) {
-        showToast('Εισάγετε έγκυρο ποσό', 'warning');
-        return;
-      }
-      
-      const date = new Date().toLocaleDateString('el-GR');
-      const timestamp = Date.now();
-      
-      const newExpense = {
-        id: timestamp + Math.random().toString(36).substr(2, 9),
-        category: category,
-        amount: Number(amount),
-        user: user,
-        note: note,
-        date: date,
-        created: new Date().toISOString(),
-        timestamp: timestamp
-      };
-      
-      // Προσθήκη στη λίστα
-      expenses.push(newExpense);
-      currentTrip.expenses = expenses;
-      
-      // ΑΠΟΘΗΚΕΥΣΗ
-      saveTripToStorage();
-      updateTotals();
-      
-      // ΔΗΜΙΟΥΡΓΙΑ BROADCAST DATA
-      const broadcastData = {
-        type: 'NEW_EXPENSE',
-        expense: newExpense,
-        tripCode: currentTrip.code,
-        sender: currentUser,
-        timestamp: timestamp
-      };
-      
-      // ΠΡΟΣΠΑΘΕΙΑ ΑΠΟΣΤΟΛΗΣ ΜΕΣΩ P2P
-      attemptP2PBroadcast(broadcastData, newExpense);
-      
-      // Καθαρισμός
-      document.getElementById('expenseAmount').value = '';
-      document.getElementById('expenseNote').value = '';
-      document.getElementById('expenseAmount').focus();
-    }
-
     // ΑΠΟΘΗΚΕΥΣΗ ΤΑΞΙΔΙΟΥ
     function saveTripToStorage() {
       if (!currentTrip) return;
@@ -2649,12 +2558,12 @@
         .catch(() => showToast('Αποτυχία αντιγραφής', 'danger'));
     }
     
-    function copyShareLink() {
-      navigator.clipboard.writeText(document.getElementById('shareLink').value)
-        .then(() => showToast('Ο σύνδεσμος αντιγράφηκε!', 'success'))
-        .catch(() => showToast('Αποτυχία αντιγραφής', 'danger'));
-    }
-    
+     function copyShareLink() {
+  const shareLink = document.getElementById('shareLink').value;
+  navigator.clipboard.writeText(shareLink)
+    .then(() => showToast('Ο σύνδεσμος αντιγράφηκε!', 'success'))
+    .catch(() => showToast('Αποτυχία αντιγραφής', 'danger'));
+}   
     function showShareModal() {
       document.getElementById('shareModal').style.display = 'flex';
     }
