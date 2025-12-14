@@ -601,6 +601,7 @@
                 <option value="Ενοικίαση Αυτοκινήτου">Ενοικίαση Αυτοκινήτου 🚗</option>
                 <option value="Διαμονή">Διαμονή 🏨</option>
                 <option value="Αξιοθέατα">Αξιοθέατα 🏛️</option>
+                <option value="ΕΚΤΑΚΤΑ">ΕΚΤΑΚΤΑ ⚠️</option>
               </select>
             </div>        
             
@@ -704,17 +705,18 @@
   <script>
     // Κατηγορίες
     let categories = [
-      { name: "Πρωινό", emoji: "🥐", color: "#f59e0b" },
-      { name: "Μεσημεριανό", emoji: "🍝", color: "#10b981" },
-      { name: "Βραδινό", emoji: "🍲", color: "#8b82f6" },
-      { name: "Σνακ", emoji: "🍦", color: "#ec4899" },
-      { name: "Δώρα", emoji: "🎁", color: "#ef4444" },
-      { name: "Μέσα Μεταφοράς", emoji: "🚌", color: "#3b82f6" },
-      { name: "Αεροπορικά", emoji: "✈️", color: "#06b6d4" },
-      { name: "Ενοικίαση Αυτοκινήτου", emoji: "🚗", color: "#8b5cf6" },
-      { name: "Διαμονή", emoji: "🏨", color: "#f59e0b" },
-      { name: "Αξιοθέατα", emoji: "🏛️", color: "#10b981" }
-    ];
+  { name: "Πρωινό", emoji: "🥐", color: "#f59e0b" },
+  { name: "Μεσημεριανό", emoji: "🍝", color: "#10b981" },
+  { name: "Βραδινό", emoji: "🍲", color: "#8b82f6" },
+  { name: "Σνακ", emoji: "🍦", color: "#ec4899" },
+  { name: "Δώρα", emoji: "🎁", color: "#ef4444" },
+  { name: "Μέσα Μεταφοράς", emoji: "🚌", color: "#3b82f6" },
+  { name: "Αεροπορικά", emoji: "✈️", color: "#06b6d4" },
+  { name: "Ενοικίαση Αυτοκινήτου", emoji: "🚗", color: "#8b5cf6" },
+  { name: "Διαμονή", emoji: "🏨", color: "#f59e0b" },
+  { name: "Αξιοθέατα", emoji: "🏛️", color: "#10b981" },  // <-- ΠΡΟΣΕΧΕ: ΕΔΩ ΒΑΛΕ ΚΟΜΜΑ!
+  { name: "ΕΚΤΑΚΤΑ", emoji: "⚠️", color: "#dc2626" }
+];
 
     // Μεταβλητές
     let currentTrip = null;
