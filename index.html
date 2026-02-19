@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Travel Expense Tracker - Ατομική Έκδοση</title>
+  <title>Travel Expense Tracker</title>
   <link rel="icon" href="https://img.icons8.com/color/96/000000/wallet--v1.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -510,7 +510,7 @@
     <div id="setupScreen">
       <header>
         <h1><i class="fas fa-receipt"></i> Travel Expense Tracker</h1>
-        <p class="tagline">Ατομική καταγραφή εξόδων ταξιδιού</p>
+        <p class="tagline">Καταγραφή εξόδων ταξιδιού</p>
       </header>
       
       <div class="setup-section">
@@ -525,11 +525,6 @@
             <input id="setupTripName" type="text" placeholder="Π.χ. Κρήτη Ιούλιος 2023">
           </div>
           
-          <div class="form-group">
-            <label for="setupUserName"><i class="fas fa-user"></i> Το Όνομά Σας</label>
-            <input id="setupUserName" type="text" placeholder="Το όνομά σας">
-          </div>
-          
           <button class="btn btn-primary" onclick="createNewTrip()" style="width: 100%; margin-top: 16px;">
             <i class="fas fa-plus-circle"></i> Δημιουργία Ταξιδιού
           </button>
@@ -541,14 +536,13 @@
     <div id="appScreen" style="display: none;">
       <header>
         <h1><i class="fas fa-receipt"></i> Travel Expense Tracker</h1>
-        <p class="tagline" id="tripTagline">Ατομική καταγραφή εξόδων</p>
+        <p class="tagline">Καταγραφή εξόδων ταξιδιού</p>
       </header>
 
       <!-- Trip Info -->
       <div class="trip-info">
         <div class="trip-details">
           <h2 id="currentTripTitle">Ταξίδι</h2>
-          <div id="currentUserDisplay"></div>
         </div>
       </div>
 
@@ -720,13 +714,12 @@
 
     // Μεταβλητές
     let currentTrip = null;
-    let currentUser = null;
     let expenses = [];
     let chart = null;
 
     // Αρχικοποίηση
     document.addEventListener('DOMContentLoaded', function() {
-      console.log("🚀 Ατομική Έκδοση - Χωρίς Συγχρονισμό");
+      console.log("🚀 Travel Expense Tracker");
       
       // Event listeners για τα tabs
       document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -753,19 +746,14 @@
 
     // ==================== MAIN FUNCTIONS ====================
     function checkSavedTrip() {
-  // ΠΑΝΤΑ προσπάθησε να φορτώσεις τα ΑΠΟΘΗΚΕΥΜΕΝΑ δεδομένα
   const savedTrip = localStorage.getItem('currentTrip');
-  const savedUserName = localStorage.getItem('currentUserName');
-  
-  if (savedTrip && savedUserName) {
-    // ΒΡΕΘΗΚΑΝ ΔΕΔΟΜΕΝΑ - ΦΟΡΤΩΣΕ ΤΑ
+
+  if (savedTrip) {
     currentTrip = JSON.parse(savedTrip);
-    currentUser = savedUserName;
     expenses = currentTrip.expenses || [];
     showApp();
     updateUI();
   } else {
-    // ΔΕΝ ΒΡΕΘΗΚΑΝ ΔΕΔΟΜΕΝΑ - ΕΜΦΑΝΙΣΗ SETUP
     setupScreen.style.display = 'block';
     appScreen.style.display = 'none';
   }
@@ -773,29 +761,27 @@
 
 function createNewTrip() {
   const tripName = document.getElementById('setupTripName').value.trim();
-  const userName = document.getElementById('setupUserName').value.trim();
-  
-  if (!tripName || !userName) {
-    showToast('Συμπληρώστε όνομα ταξιδιού και το όνομά σας', 'warning');
+
+  if (!tripName) {
+    showToast('Συμπληρώστε όνομα ταξιδιού', 'warning');
     return;
   }
-  
+
   const tripCode = 'LOCAL_' + Date.now().toString(36).toUpperCase();
-  
+
   currentTrip = {
     code: tripCode,
     name: tripName,
     created: new Date().toISOString(),
     expenses: []
   };
-  
-  currentUser = userName;
+
   expenses = [];
-  
+
   saveTripToStorage();
   showApp();
   updateUI();
-  
+
   showToast(`Δημιουργήθηκε το ταξίδι "${tripName}"`, 'success');
 }
 
@@ -825,22 +811,14 @@ function createNewTrip() {
   setupScreen.style.display = 'none';
   appScreen.style.display = 'block';
   updateTotals();
-  
-  // ΚΑΘΑΡΙΣΜΟΣ ΤΩΝ INPUTS
+
   document.getElementById('setupTripName').value = '';
-  document.getElementById('setupUserName').value = '';
 }
    
     function updateUI() {
       if (!currentTrip) return;
-      
+
       document.getElementById('currentTripTitle').textContent = currentTrip.name;
-      document.getElementById('tripTagline').textContent = `Ατομική καταγραφή για ${currentUser}`;
-      document.getElementById('currentUserDisplay').innerHTML = `
-        <div style="margin-top: 8px; color: var(--primary-dark);">
-          <i class="fas fa-user"></i> ${currentUser}
-        </div>
-      `;
     }
 
     function addQuickExpense() {
@@ -858,7 +836,6 @@ function createNewTrip() {
         id: Date.now() + Math.random(),
         amount: amount,
         category: category,
-        user: currentUser,
         note: note || '',
         date: new Date().toLocaleDateString('el-GR'),
         timestamp: Date.now()
@@ -880,12 +857,9 @@ function createNewTrip() {
 
     function saveTripToStorage() {
       if (!currentTrip) return;
-      
-      // Αποθήκευση τρέχοντος ταξιδιού
+
       localStorage.setItem('currentTrip', JSON.stringify(currentTrip));
-      localStorage.setItem('currentUserName', currentUser);
-      
-      // Αποθήκευση στην λίστα όλων των ταξιδιών
+
       const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
       allTrips[currentTrip.code] = currentTrip;
       localStorage.setItem('allTrips', JSON.stringify(allTrips));
@@ -1119,7 +1093,6 @@ updateCategorySummary();  // <-- ΠΡΟΣΘΗΚΗ!
       }
       
       currentTrip = allTrips[tripCode];
-      currentUser = localStorage.getItem('currentUserName') || 'Ταξιδιώτης';
       expenses = currentTrip.expenses || [];
       
       localStorage.setItem('currentTrip', JSON.stringify(currentTrip));
@@ -1132,19 +1105,17 @@ updateCategorySummary();  // <-- ΠΡΟΣΘΗΚΗ!
 
     function exportAllData() {
       const allTrips = JSON.parse(localStorage.getItem('allTrips') || '{}');
-      const userName = localStorage.getItem('currentUserName') || 'Ταξιδιώτης';
-      
+
       const exportData = {
-        user: userName,
         trips: allTrips,
         exportDate: new Date().toISOString(),
         version: '1.0'
       };
-      
+
       const dataStr = JSON.stringify(exportData, null, 2);
       const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      
-      const exportFileDefaultName = `travel_expenses_${userName}_${new Date().toISOString().split('T')[0]}.json`;
+
+      const exportFileDefaultName = `travel_expenses_${new Date().toISOString().split('T')[0]}.json`;
       
       const linkElement = document.createElement('a');
       linkElement.setAttribute('href', dataUri);
